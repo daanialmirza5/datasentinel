@@ -29,6 +29,7 @@ ignore = [
   "S101",   # assert is fine in tests
   "B008",   # FastAPI Depends() in defaults is idiomatic
   "RUF012", # mutable class attributes in pydantic/sqlalchemy models
+  "SIM108", # if/else blocks are often clearer than ternaries
   "RUF001", "RUF002", "RUF003", # typographic unicode in prose is intentional
 ]
 
