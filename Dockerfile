@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Single image: builds the React frontend, then serves it and the API from one FastAPI process.
 
-FROM node:22.23-alpine AS frontend
+FROM node:26.11-alpine AS frontend
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
