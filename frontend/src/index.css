@@ -1,1 +1,50 @@
 @import 'tailwindcss';
+
+/* Light, neutral engineering palette. Status colours follow the data-viz status palette and are
+   always paired with an icon + label (never colour alone). */
+@theme {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+
+  --color-canvas: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-line: #e3e5e9;
+  --color-ink: #111418;
+  --color-ink-2: #4b5260;
+  --color-ink-3: #6b7280;
+
+  --color-accent: #2a78d6;
+  --color-accent-strong: #1c5cab;
+  --color-series-base: #2a78d6;
+  --color-series-candidate: #eb6834;
+
+  --color-good: #0ca30c;
+  --color-good-ink: #006300;
+  --color-warning: #fab219;
+  --color-warning-ink: #7a5200;
+  --color-serious: #ec835a;
+  --color-serious-ink: #9a3a12;
+  --color-critical: #d03b3b;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (forced-colors: active) {
+  .react-flow__node {
+    border: 1px solid CanvasText;
+  }
+}
