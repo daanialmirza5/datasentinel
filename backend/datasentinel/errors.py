@@ -25,8 +25,9 @@ class AppError(Exception):
     status_code = 400
     code = "bad_request"
 
-    def __init__(self, message: str, *, details: Any = None, status_code: int | None = None,
-                 code: str | None = None) -> None:
+    def __init__(
+        self, message: str, *, details: Any = None, status_code: int | None = None, code: str | None = None
+    ) -> None:
         super().__init__(message)
         self.message = message
         self.details = details
@@ -65,8 +66,7 @@ def _request_id(request: Request) -> str | None:
     return getattr(request.state, "request_id", None)
 
 
-def error_response(request: Request, status_code: int, code: str, message: str,
-                   details: Any = None) -> JSONResponse:
+def error_response(request: Request, status_code: int, code: str, message: str, details: Any = None) -> JSONResponse:
     body: dict[str, Any] = {"error": {"code": code, "message": message}}
     if details is not None:
         body["error"]["details"] = details
@@ -114,5 +114,6 @@ def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled error on %s %s", request.method, request.url.path, exc_info=exc)
-        return error_response(request, 500, "internal_error",
-                              "An unexpected error occurred. Check the server logs with the request id.")
+        return error_response(
+            request, 500, "internal_error", "An unexpected error occurred. Check the server logs with the request id."
+        )

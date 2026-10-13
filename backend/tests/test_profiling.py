@@ -116,10 +116,12 @@ def test_profile_endpoint_is_cached(client):
 
 def test_profile_performance_reasonable_for_100k_rows():
     rng = np.random.default_rng(0)
-    frame = pd.DataFrame({"a": rng.normal(size=100_000), "b": rng.integers(0, 50, 100_000),
-                          "c": rng.choice(["x", "y", "z"], 100_000)})
+    frame = pd.DataFrame(
+        {"a": rng.normal(size=100_000), "b": rng.integers(0, 50, 100_000), "c": rng.choice(["x", "y", "z"], 100_000)}
+    )
     content = frame.to_csv(index=False).encode()
     import time
+
     start = time.perf_counter()
     profile = profile_of(content)
     elapsed = time.perf_counter() - start

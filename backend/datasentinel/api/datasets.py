@@ -35,9 +35,15 @@ def dataset_out(session: Session, dataset: Dataset) -> DatasetOut:
     current = svc.current_version(session, dataset)
     asset_id = session.scalar(select(LineageAsset.id).where(LineageAsset.dataset_id == dataset.id))
     return DatasetOut(
-        id=dataset.id, name=dataset.name, description=dataset.description, kind=dataset.kind,
-        created_at=dataset.created_at, updated_at=dataset.updated_at, version_count=len(versions),
-        current_version=VersionOut.model_validate(current) if current else None, asset_id=asset_id,
+        id=dataset.id,
+        name=dataset.name,
+        description=dataset.description,
+        kind=dataset.kind,
+        created_at=dataset.created_at,
+        updated_at=dataset.updated_at,
+        version_count=len(versions),
+        current_version=VersionOut.model_validate(current) if current else None,
+        asset_id=asset_id,
     )
 
 
@@ -72,12 +78,21 @@ def import_dataset(
     """
     content = _read_upload(file, settings.max_upload_bytes)
     version = svc.import_version(
-        session, settings, content=content, filename=file.filename, dataset_id=dataset_id or None,
-        dataset_name=dataset_name or None, description=description, file_format=file_format,
+        session,
+        settings,
+        content=content,
+        filename=file.filename,
+        dataset_id=dataset_id or None,
+        dataset_name=dataset_name or None,
+        description=description,
+        file_format=file_format,
     )
     dataset = svc.get_dataset(session, version.dataset_id)
-    return ImportResponse(dataset=dataset_out(session, dataset), version=VersionOut.model_validate(version),
-                          summary=version.import_summary)
+    return ImportResponse(
+        dataset=dataset_out(session, dataset),
+        version=VersionOut.model_validate(version),
+        summary=version.import_summary,
+    )
 
 
 @router.get("", response_model=Page[DatasetOut])
@@ -122,8 +137,9 @@ def update_dataset(dataset_id: str, body: DatasetUpdate, session: Session = Depe
 
 
 @router.delete("/{dataset_id}")
-def delete_dataset(dataset_id: str, session: Session = Depends(get_db),
-                   settings: Settings = Depends(get_settings_dep)) -> dict[str, object]:
+def delete_dataset(
+    dataset_id: str, session: Session = Depends(get_db), settings: Settings = Depends(get_settings_dep)
+) -> dict[str, object]:
     """Permanently delete a dataset, all of its versions, stored files, rules, results and lab data."""
     dataset = svc.get_dataset(session, dataset_id)
     removed = svc.delete_dataset(session, settings, dataset)
@@ -149,20 +165,24 @@ def get_import_summary(dataset_id: str, version_id: str, session: Session = Depe
 
 
 @router.delete("/{dataset_id}/versions/{version_id}")
-def delete_version(dataset_id: str, version_id: str, session: Session = Depends(get_db),
-                   settings: Settings = Depends(get_settings_dep)) -> dict[str, object]:
+def delete_version(
+    dataset_id: str, version_id: str, session: Session = Depends(get_db), settings: Settings = Depends(get_settings_dep)
+) -> dict[str, object]:
     dataset = svc.get_dataset(session, dataset_id)
     version = svc.get_version(session, dataset, version_id)
-    if session.scalar(select(func.count()).select_from(DatasetVersion)
-                      .where(DatasetVersion.dataset_id == dataset.id)) == 1:
+    if (
+        session.scalar(select(func.count()).select_from(DatasetVersion).where(DatasetVersion.dataset_id == dataset.id))
+        == 1
+    ):
         raise ConflictError("Cannot delete the only version; delete the dataset instead.")
     svc.delete_version(session, settings, version)
     return {"deleted": True, "version_id": version_id}
 
 
 @router.post("/{dataset_id}/versions/{version_id}/quarantine", response_model=VersionOut)
-def quarantine_version(dataset_id: str, version_id: str, body: QuarantineRequest,
-                       session: Session = Depends(get_db)) -> VersionOut:
+def quarantine_version(
+    dataset_id: str, version_id: str, body: QuarantineRequest, session: Session = Depends(get_db)
+) -> VersionOut:
     """Mark a version as quarantined. Data is kept; the previous active version becomes current."""
     dataset = svc.get_dataset(session, dataset_id)
     version = svc.get_version(session, dataset, version_id)
@@ -196,33 +216,52 @@ def preview(
     version = svc.resolve_version(session, dataset, version_id)
     limit = min(limit, settings.preview_max_page_size)
     table = svc.load_table(settings, version)
-    page = table.raw.iloc[offset: offset + limit]
+    page = table.raw.iloc[offset : offset + limit]
     rows = [[None if v is None else str(v) for v in record] for record in page.itertuples(index=False, name=None)]
     return PreviewOut(
-        dataset_id=dataset.id, version_id=version.id,
-        columns=[ColumnSchema(**c) for c in table.schema], rows=rows,
-        row_numbers=[int(i) + 1 for i in page.index], total=len(table.raw), offset=offset, limit=limit,
+        dataset_id=dataset.id,
+        version_id=version.id,
+        columns=[ColumnSchema(**c) for c in table.schema],
+        rows=rows,
+        row_numbers=[int(i) + 1 for i in page.index],
+        total=len(table.raw),
+        offset=offset,
+        limit=limit,
     )
 
 
 @router.get("/{dataset_id}/profile", response_model=ProfileOut)
-def get_profile(dataset_id: str, version_id: str | None = None, session: Session = Depends(get_db),
-                settings: Settings = Depends(get_settings_dep)) -> ProfileOut:
+def get_profile(
+    dataset_id: str,
+    version_id: str | None = None,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings_dep),
+) -> ProfileOut:
     """Exact column statistics for a version (defaults to the current version). Cached per version."""
     dataset = svc.get_dataset(session, dataset_id)
     version = svc.resolve_version(session, dataset, version_id)
     stored, cached = get_or_compute_profile(session, settings, version)
-    return ProfileOut(dataset_id=dataset.id, version_id=version.id, version_number=version.version_number,
-                      computed_at=stored.computed_at, duration_ms=round(stored.duration_ms, 2), cached=cached,
-                      profile=stored.profile)
+    return ProfileOut(
+        dataset_id=dataset.id,
+        version_id=version.id,
+        version_number=version.version_number,
+        computed_at=stored.computed_at,
+        duration_ms=round(stored.duration_ms, 2),
+        cached=cached,
+        profile=stored.profile,
+    )
 
 
 @router.get("/{dataset_id}/rejected-rows", response_model=RejectedRowsOut)
-def rejected_rows(dataset_id: str, version_id: str | None = None,
-                  session: Session = Depends(get_db)) -> RejectedRowsOut:
+def rejected_rows(
+    dataset_id: str, version_id: str | None = None, session: Session = Depends(get_db)
+) -> RejectedRowsOut:
     dataset = svc.get_dataset(session, dataset_id)
     version = svc.resolve_version(session, dataset, version_id)
     summary = version.import_summary
-    return RejectedRowsOut(version_id=version.id, total=version.rejected_row_count,
-                           truncated=bool(summary.get("rejected_rows_truncated")),
-                           rows=summary.get("rejected_rows", []))
+    return RejectedRowsOut(
+        version_id=version.id,
+        total=version.rejected_row_count,
+        truncated=bool(summary.get("rejected_rows_truncated")),
+        rows=summary.get("rejected_rows", []),
+    )

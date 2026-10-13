@@ -32,8 +32,9 @@ EXTENSION_FORMATS = {".csv": "csv", ".tsv": "csv", ".json": "json", ".jsonl": "j
 
 # Values treated as missing. Matching is exact after stripping whitespace (case-sensitive set
 # below covers common spellings) so a legitimate value such as "Nana" is never nulled.
-NULL_TOKENS = frozenset({"", "NA", "N/A", "n/a", "na", "NaN", "nan", "NULL", "null", "Null", "None",
-                         "none", "#N/A", "-", "--", "?"})
+NULL_TOKENS = frozenset(
+    {"", "NA", "N/A", "n/a", "na", "NaN", "nan", "NULL", "null", "Null", "None", "none", "#N/A", "-", "--", "?"}
+)
 MAX_COLUMN_NAME_LENGTH = 128
 MAX_REJECTED_ROWS_KEPT = 500
 _CONTROL_CHARS = re.compile(r"[\x00-\x1f\x7f]")
@@ -122,8 +123,9 @@ def normalise_column_names(raw_names: list[str], warnings: list[str]) -> tuple[l
             warnings.append(f"Column {index + 1} has an empty header; named it '{name}'.")
         if len(name) > MAX_COLUMN_NAME_LENGTH:
             name = name[:MAX_COLUMN_NAME_LENGTH]
-            warnings.append(f"Column {index + 1} header was longer than {MAX_COLUMN_NAME_LENGTH} "
-                            "characters and was truncated.")
+            warnings.append(
+                f"Column {index + 1} header was longer than {MAX_COLUMN_NAME_LENGTH} characters and was truncated."
+            )
         base, suffix = name, 2
         while name in seen:
             name = f"{base}__{suffix}"
@@ -192,8 +194,7 @@ def parse_csv(text: str, limits: ParseLimits, result: ParsedTable) -> None:
                 result.warnings.append("The header row contains only numbers; the file may be missing a header.")
             continue
         if len(raw_row) != len(header):
-            result.reject(line, f"Expected {len(header)} fields, found {len(raw_row)}",
-                          delimiter.join(raw_row))
+            result.reject(line, f"Expected {len(header)} fields, found {len(raw_row)}", delimiter.join(raw_row))
             continue
         if any(len(cell) > limits.max_cell_chars for cell in raw_row):
             result.reject(line, f"A cell exceeds {limits.max_cell_chars} characters", delimiter.join(raw_row))
@@ -231,8 +232,7 @@ def _json_cell(value: Any, limits: ParseLimits) -> str | None:
     return text
 
 
-def _records_to_frame(records: list[tuple[int, dict[str, Any]]], limits: ParseLimits,
-                      result: ParsedTable) -> None:
+def _records_to_frame(records: list[tuple[int, dict[str, Any]]], limits: ParseLimits, result: ParsedTable) -> None:
     columns: list[str] = []
     seen: set[str] = set()
     flat_records: list[tuple[int, dict[str, Any]]] = []
@@ -284,7 +284,8 @@ def parse_json(text: str, limits: ParseLimits, result: ParsedTable) -> None:
         if len(lists) != 1:
             raise ValidationFailed(
                 "JSON must be an array of objects, or an object containing exactly one array of records "
-                "(for example {\"data\": [...]}).")
+                '(for example {"data": [...]}).'
+            )
         result.warnings.append(f"Records were read from the '{lists[0][0]}' key.")
         document = lists[0][1]
     if not isinstance(document, list):
@@ -318,8 +319,10 @@ def parse_jsonl(text: str, limits: ParseLimits, result: ParsedTable) -> None:
         records.append((line_number, item))
         _check_row_limit(len(records), limits)
     if not records:
-        raise ValidationFailed("No valid JSON objects found in the JSON Lines file.",
-                               details={"rejected": [r.as_dict() for r in result.rejected[:20]]})
+        raise ValidationFailed(
+            "No valid JSON objects found in the JSON Lines file.",
+            details={"rejected": [r.as_dict() for r in result.rejected[:20]]},
+        )
     _records_to_frame(records, limits, result)
 
 

@@ -27,8 +27,7 @@ def ready(request: Request) -> JSONResponse:
     try:
         status = migration_status(request.app.state.engine)
         checks["database"] = {"ok": True}
-        checks["migrations"] = {"ok": bool(status["up_to_date"]), "current": status["current"],
-                                "head": status["head"]}
+        checks["migrations"] = {"ok": bool(status["up_to_date"]), "current": status["current"], "head": status["head"]}
     except Exception as exc:
         checks["database"] = {"ok": False, "error": type(exc).__name__}
         checks["migrations"] = {"ok": False}
@@ -44,5 +43,6 @@ def ready(request: Request) -> JSONResponse:
         checks["storage"] = {"ok": False, "error": type(exc).__name__}
 
     is_ready = all(check["ok"] for check in checks.values())
-    return JSONResponse(status_code=200 if is_ready else 503,
-                        content={"status": "ready" if is_ready else "not_ready", "checks": checks})
+    return JSONResponse(
+        status_code=200 if is_ready else 503, content={"status": "ready" if is_ready else "not_ready", "checks": checks}
+    )

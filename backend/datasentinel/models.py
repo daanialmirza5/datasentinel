@@ -70,11 +70,15 @@ class Dataset(Base):
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, onupdate=utcnow)
 
     versions: Mapped[list[DatasetVersion]] = relationship(
-        back_populates="dataset", cascade="all, delete-orphan", passive_deletes=True,
+        back_populates="dataset",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
         order_by="DatasetVersion.version_number",
     )
     rules: Mapped[list[QualityRule]] = relationship(
-        back_populates="dataset", cascade="all, delete-orphan", passive_deletes=True,
+        back_populates="dataset",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
         order_by="QualityRule.created_at",
     )
 
@@ -99,7 +103,8 @@ class DatasetVersion(Base):
     schema_json: Mapped[list[Any]] = mapped_column(JSON, default=list)
     import_summary: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     parent_version_id: Mapped[str | None] = mapped_column(
-        ForeignKey("dataset_versions.id", ondelete="SET NULL"), nullable=True)
+        ForeignKey("dataset_versions.id", ondelete="SET NULL"), nullable=True
+    )
     status: Mapped[str] = mapped_column(String(16), default="active")  # active | quarantined
     status_reason: Mapped[str] = mapped_column(Text, default="")
     imported_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, index=True)
@@ -110,8 +115,7 @@ class DatasetVersion(Base):
 class VersionProfile(Base):
     __tablename__ = "version_profiles"
 
-    version_id: Mapped[str] = mapped_column(
-        ForeignKey("dataset_versions.id", ondelete="CASCADE"), primary_key=True)
+    version_id: Mapped[str] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"), primary_key=True)
     algorithm_version: Mapped[str] = mapped_column(String(16))
     profile: Mapped[dict[str, Any]] = mapped_column(JSON)
     computed_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
@@ -148,7 +152,8 @@ class ValidationRun(Base):
     summary: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
     results: Mapped[list[RuleResult]] = relationship(
-        back_populates="run", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="run", cascade="all, delete-orphan", passive_deletes=True
+    )
 
 
 class RuleResult(Base):
@@ -157,7 +162,8 @@ class RuleResult(Base):
     id: Mapped[str] = mapped_column(String(40), primary_key=True, default=lambda: new_id("res"))
     run_id: Mapped[str] = mapped_column(ForeignKey("validation_runs.id", ondelete="CASCADE"), index=True)
     rule_id: Mapped[str | None] = mapped_column(
-        ForeignKey("quality_rules.id", ondelete="SET NULL"), nullable=True, index=True)
+        ForeignKey("quality_rules.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     rule_name: Mapped[str] = mapped_column(String(120))
     rule_type: Mapped[str] = mapped_column(String(32))
     column_name: Mapped[str | None] = mapped_column(String(128), nullable=True)
@@ -177,15 +183,13 @@ class RuleResult(Base):
 class DriftResult(Base):
     __tablename__ = "drift_results"
     __table_args__ = (
-        UniqueConstraint("base_version_id", "candidate_version_id", "algorithm_version",
-                         name="uq_drift_pair"),
+        UniqueConstraint("base_version_id", "candidate_version_id", "algorithm_version", name="uq_drift_pair"),
     )
 
     id: Mapped[str] = mapped_column(String(40), primary_key=True, default=lambda: new_id("drift"))
     dataset_id: Mapped[str] = mapped_column(ForeignKey("datasets.id", ondelete="CASCADE"), index=True)
     base_version_id: Mapped[str] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"))
-    candidate_version_id: Mapped[str] = mapped_column(
-        ForeignKey("dataset_versions.id", ondelete="CASCADE"), index=True)
+    candidate_version_id: Mapped[str] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"), index=True)
     algorithm_version: Mapped[str] = mapped_column(String(16))
     result: Mapped[dict[str, Any]] = mapped_column(JSON)
     computed_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
@@ -201,7 +205,8 @@ class LineageAsset(Base):
     description: Mapped[str] = mapped_column(Text, default="")
     owner: Mapped[str] = mapped_column(String(120), default="")
     dataset_id: Mapped[str | None] = mapped_column(
-        ForeignKey("datasets.id", ondelete="CASCADE"), nullable=True, unique=True)
+        ForeignKey("datasets.id", ondelete="CASCADE"), nullable=True, unique=True
+    )
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)
 
 
@@ -222,10 +227,10 @@ class Experiment(Base):
     id: Mapped[str] = mapped_column(String(40), primary_key=True, default=lambda: new_id("exp"))
     dataset_id: Mapped[str] = mapped_column(ForeignKey("datasets.id", ondelete="CASCADE"), index=True)
     base_version_id: Mapped[str] = mapped_column(ForeignKey("dataset_versions.id", ondelete="CASCADE"))
-    lab_dataset_id: Mapped[str | None] = mapped_column(
-        ForeignKey("datasets.id", ondelete="SET NULL"), nullable=True)
+    lab_dataset_id: Mapped[str | None] = mapped_column(ForeignKey("datasets.id", ondelete="SET NULL"), nullable=True)
     result_version_id: Mapped[str | None] = mapped_column(
-        ForeignKey("dataset_versions.id", ondelete="SET NULL"), nullable=True)
+        ForeignKey("dataset_versions.id", ondelete="SET NULL"), nullable=True
+    )
     fault_type: Mapped[str] = mapped_column(String(32))
     params: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     seed: Mapped[int] = mapped_column(Integer)
@@ -245,9 +250,11 @@ class Report(Base):
 
     id: Mapped[str] = mapped_column(String(40), primary_key=True, default=lambda: new_id("rpt"))
     dataset_id: Mapped[str | None] = mapped_column(
-        ForeignKey("datasets.id", ondelete="SET NULL"), nullable=True, index=True)
+        ForeignKey("datasets.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     version_id: Mapped[str | None] = mapped_column(
-        ForeignKey("dataset_versions.id", ondelete="SET NULL"), nullable=True)
+        ForeignKey("dataset_versions.id", ondelete="SET NULL"), nullable=True
+    )
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[dict[str, Any]] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, index=True)

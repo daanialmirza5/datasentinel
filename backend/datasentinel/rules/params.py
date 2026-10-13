@@ -19,8 +19,9 @@ class ColumnExistsParams(_Params):
 
 
 class NotNullParams(_Params):
-    max_null_pct: float = Field(default=0.0, ge=0, le=100,
-                                description="Largest acceptable percentage of missing values.")
+    max_null_pct: float = Field(
+        default=0.0, ge=0, le=100, description="Largest acceptable percentage of missing values."
+    )
 
 
 class RangeParams(_Params):
@@ -48,8 +49,9 @@ class PatternParams(_Params):
 
 
 class UniqueParams(_Params):
-    extra_columns: list[str] = Field(default_factory=list, max_length=10,
-                                     description="Additional columns forming a composite key.")
+    extra_columns: list[str] = Field(
+        default_factory=list, max_length=10, description="Additional columns forming a composite key."
+    )
     ignore_nulls: bool = True
 
 
@@ -75,8 +77,9 @@ class AggregateRangeParams(_Params):
 class TimestampRangeParams(_Params):
     min: datetime | None = None
     max: datetime | None = None
-    max_future_days: float | None = Field(default=None, ge=0,
-                                          description="Reject values later than now + this many days.")
+    max_future_days: float | None = Field(
+        default=None, ge=0, description="Reject values later than now + this many days."
+    )
 
     @model_validator(mode="after")
     def _bounds(self) -> TimestampRangeParams:

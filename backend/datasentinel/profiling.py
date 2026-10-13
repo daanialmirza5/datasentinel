@@ -125,9 +125,11 @@ def _datetime_profile(series: pd.Series) -> dict[str, Any]:
     histogram: dict[str, Any] | None = None
     if lo != hi:
         counts, edges = np.histogram(epoch, bins=HISTOGRAM_BINS)
-        histogram = {"kind": "time_bins",
-                     "edges": [datetime.fromtimestamp(float(e), UTC).isoformat() for e in edges],
-                     "counts": counts.astype(int).tolist()}
+        histogram = {
+            "kind": "time_bins",
+            "edges": [datetime.fromtimestamp(float(e), UTC).isoformat() for e in edges],
+            "counts": counts.astype(int).tolist(),
+        }
     return {
         "min": lo.isoformat(),
         "max": hi.isoformat(),
@@ -155,8 +157,11 @@ def profile_column(name: str, raw: pd.Series, typed: pd.Series, inference: Any) 
     non_null = int(non_null_raw.size)
     kind = inference.inferred_type
     counts = non_null_raw.astype(str).value_counts()
-    is_categorical = (kind in ("string", "boolean") and 0 < distinct <= CATEGORICAL_MAX_DISTINCT
-                      and (distinct / non_null <= CATEGORICAL_MAX_RATIO or non_null < 50))
+    is_categorical = (
+        kind in ("string", "boolean")
+        and 0 < distinct <= CATEGORICAL_MAX_DISTINCT
+        and (distinct / non_null <= CATEGORICAL_MAX_RATIO or non_null < 50)
+    )
 
     profile: dict[str, Any] = {
         "name": name,
@@ -175,12 +180,14 @@ def profile_column(name: str, raw: pd.Series, typed: pd.Series, inference: Any) 
         "is_categorical": is_categorical,
         "mixed": inference.mixed,
         "notes": list(inference.notes),
-        "top_values": [{"value": str(v), "count": int(c), "pct": _pct(int(c), non_null)}
-                       for v, c in counts.head(10).items()],
+        "top_values": [
+            {"value": str(v), "count": int(c), "pct": _pct(int(c), non_null)} for v, c in counts.head(10).items()
+        ],
     }
     if is_categorical:
-        profile["categories"] = [{"value": str(v), "count": int(c), "pct": _pct(int(c), non_null)}
-                                 for v, c in counts.items()]
+        profile["categories"] = [
+            {"value": str(v), "count": int(c), "pct": _pct(int(c), non_null)} for v, c in counts.items()
+        ]
     if kind in ("integer", "float"):
         profile.update(_numeric_profile(typed, kind == "integer"))
     elif kind == "datetime":
@@ -188,8 +195,13 @@ def profile_column(name: str, raw: pd.Series, typed: pd.Series, inference: Any) 
     elif kind == "boolean":
         values = typed.dropna()
         true_count = int(values.sum())
-        profile.update({"true_count": true_count, "false_count": int(values.size - true_count),
-                        "true_pct": _pct(true_count, int(values.size))})
+        profile.update(
+            {
+                "true_count": true_count,
+                "false_count": int(values.size - true_count),
+                "true_pct": _pct(true_count, int(values.size)),
+            }
+        )
     if kind in ("string", "boolean", "empty") or inference.invalid_count:
         profile.update(_text_profile(raw))
     if distinct == 1 and non_null:

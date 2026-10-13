@@ -10,7 +10,10 @@ def test_import_creates_dataset_version_and_summary(client):
     assert version["version_number"] == 1
     assert version["row_count"] == 4 and version["column_count"] == 3
     assert {c["name"]: c["type"] for c in version["schema"]} == {
-        "order_id": "integer", "amount": "float", "status": "string"}
+        "order_id": "integer",
+        "amount": "float",
+        "status": "string",
+    }
     assert body["summary"]["missing_cells"] == 1
     assert len(version["sha256"]) == 64
 
@@ -102,8 +105,9 @@ def test_quarantine_makes_previous_version_current(client):
     first = import_ok(client, ORDERS_CSV, dataset_name="orders")
     ds_id = first["dataset"]["id"]
     second = import_ok(client, ORDERS_CSV + b"5,1.0,paid\n", dataset_id=ds_id)
-    response = client.post(f"/api/v1/datasets/{ds_id}/versions/{second['version']['id']}/quarantine",
-                           json={"reason": "bad export"})
+    response = client.post(
+        f"/api/v1/datasets/{ds_id}/versions/{second['version']['id']}/quarantine", json={"reason": "bad export"}
+    )
     assert response.json()["status"] == "quarantined"
     dataset = client.get(f"/api/v1/datasets/{ds_id}").json()
     assert dataset["current_version"]["id"] == first["version"]["id"]

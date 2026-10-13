@@ -94,8 +94,10 @@ def test_formula_like_values_are_kept_as_inert_text():
 
 
 def test_json_array_with_nested_objects_and_lists():
-    records = [{"id": 1, "dims": {"w": 2.5, "deep": {"x": 1}}, "tags": ["a", "b"], "ok": True},
-               {"id": 2, "dims": {"w": None}, "ok": False}]
+    records = [
+        {"id": 1, "dims": {"w": 2.5, "deep": {"x": 1}}, "tags": ["a", "b"], "ok": True},
+        {"id": 2, "dims": {"w": None}, "ok": False},
+    ]
     parsed = parse_bytes(json.dumps(records).encode(), "json", LIMITS)
     assert list(parsed.frame.columns) == ["id", "dims.w", "dims.deep.x", "tags", "ok"]
     assert parsed.frame["tags"].tolist() == ['["a", "b"]', None]

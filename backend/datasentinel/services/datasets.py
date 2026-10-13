@@ -117,9 +117,11 @@ def load_table(settings: Settings, version: DatasetVersion) -> LoadedTable:
         return cached
     content = storage_for(settings).read(version.storage_key)
     # Limits were enforced at import time; re-reading an accepted file must not fail if they changed.
-    limits = ParseLimits(max_rows=max(settings.max_rows, version.row_count + 1),
-                         max_columns=max(settings.max_columns, version.column_count),
-                         max_cell_chars=10_000_000)
+    limits = ParseLimits(
+        max_rows=max(settings.max_rows, version.row_count + 1),
+        max_columns=max(settings.max_columns, version.column_count),
+        max_cell_chars=10_000_000,
+    )
     table = build_table(parse_bytes(content, version.file_format, limits))
     table_cache.put(version.storage_key, table)
     return table
@@ -140,9 +142,13 @@ def get_version(session: Session, dataset: Dataset, version_id: str) -> DatasetV
 
 
 def list_versions(session: Session, dataset_id: str) -> list[DatasetVersion]:
-    return list(session.scalars(
-        select(DatasetVersion).where(DatasetVersion.dataset_id == dataset_id)
-        .order_by(DatasetVersion.version_number)))
+    return list(
+        session.scalars(
+            select(DatasetVersion)
+            .where(DatasetVersion.dataset_id == dataset_id)
+            .order_by(DatasetVersion.version_number)
+        )
+    )
 
 
 def current_version(session: Session, dataset: Dataset) -> DatasetVersion | None:
@@ -158,9 +164,11 @@ def previous_version(session: Session, version: DatasetVersion) -> DatasetVersio
     """The newest active version older than ``version``."""
     return session.scalars(
         select(DatasetVersion)
-        .where(DatasetVersion.dataset_id == version.dataset_id,
-               DatasetVersion.version_number < version.version_number,
-               DatasetVersion.status == "active")
+        .where(
+            DatasetVersion.dataset_id == version.dataset_id,
+            DatasetVersion.version_number < version.version_number,
+            DatasetVersion.status == "active",
+        )
         .order_by(DatasetVersion.version_number.desc())
         .limit(1)
     ).first()
@@ -216,8 +224,7 @@ def ensure_dataset_asset(session: Session, dataset: Dataset) -> LineageAsset:
     name = dataset.name
     if session.scalar(select(LineageAsset).where(LineageAsset.name == name)) is not None:
         name = f"{dataset.name} (dataset)"[:120]
-    asset = LineageAsset(name=name, kind="dataset", dataset_id=dataset.id,
-                         description=dataset.description)
+    asset = LineageAsset(name=name, kind="dataset", dataset_id=dataset.id, description=dataset.description)
     session.add(asset)
     session.flush()
     return asset
@@ -246,18 +253,25 @@ def import_version(
 
     if dataset_id:
         dataset = get_dataset(session, dataset_id)
-        version_count = session.scalar(
-            select(func.count()).select_from(DatasetVersion).where(DatasetVersion.dataset_id == dataset.id)) or 0
+        version_count = (
+            session.scalar(
+                select(func.count()).select_from(DatasetVersion).where(DatasetVersion.dataset_id == dataset.id)
+            )
+            or 0
+        )
         if version_count >= settings.max_versions_per_dataset:
             raise ConflictError(
                 f"Dataset already has {version_count} versions (limit {settings.max_versions_per_dataset}). "
-                "Delete old versions or raise DATASENTINEL_MAX_VERSIONS_PER_DATASET.")
+                "Delete old versions or raise DATASENTINEL_MAX_VERSIONS_PER_DATASET."
+            )
     else:
         name = validate_dataset_name(dataset_name or name_from_filename(display_name))
         if session.scalar(select(Dataset).where(Dataset.name == name)) is not None:
             raise ConflictError(
                 f"A dataset named '{name}' already exists. Import into it as a new version instead, "
-                "or choose another name.", details={"name": name})
+                "or choose another name.",
+                details={"name": name},
+            )
         dataset = Dataset(name=name, description=description.strip()[:2000], kind=kind)
         session.add(dataset)
         session.flush()
@@ -266,8 +280,10 @@ def import_version(
     parsed = parse_bytes(content, fmt, parse_limits(settings))
     table = build_table(parsed)
     duplicates = count_duplicate_rows(table.raw)
-    next_number = (session.scalar(
-        select(func.max(DatasetVersion.version_number)).where(DatasetVersion.dataset_id == dataset.id)) or 0) + 1
+    next_number = (
+        session.scalar(select(func.max(DatasetVersion.version_number)).where(DatasetVersion.dataset_id == dataset.id))
+        or 0
+    ) + 1
 
     version_id = new_id("ver")
     storage_key = f"{version_id}.{fmt}"
@@ -297,14 +313,19 @@ def import_version(
         table_cache.put(storage_key, table)
         identical = session.scalar(
             select(DatasetVersion.version_number).where(
-                DatasetVersion.dataset_id == dataset.id, DatasetVersion.sha256 == version.sha256,
-                DatasetVersion.id != version.id))
+                DatasetVersion.dataset_id == dataset.id,
+                DatasetVersion.sha256 == version.sha256,
+                DatasetVersion.id != version.id,
+            )
+        )
         if identical is not None:
-            version.import_summary = {**version.import_summary, "warnings": [
-                *version.import_summary["warnings"],
-                f"Content is byte-identical to version {identical}."]}
+            version.import_summary = {
+                **version.import_summary,
+                "warnings": [*version.import_summary["warnings"], f"Content is byte-identical to version {identical}."],
+            }
         if run_analysis:
             from datasentinel.services.monitoring import analyze_new_version
+
             analyze_new_version(session, settings, version)
         dataset.updated_at = version.imported_at
         session.flush()
@@ -320,8 +341,11 @@ def delete_dataset(session: Session, settings: Settings, dataset: Dataset) -> in
     from datasentinel.models import Experiment
 
     storage = storage_for(settings)
-    lab_ids = [exp.lab_dataset_id for exp in session.scalars(
-        select(Experiment).where(Experiment.dataset_id == dataset.id)) if exp.lab_dataset_id]
+    lab_ids = [
+        exp.lab_dataset_id
+        for exp in session.scalars(select(Experiment).where(Experiment.dataset_id == dataset.id))
+        if exp.lab_dataset_id
+    ]
     targets = [dataset, *[d for d in (session.get(Dataset, i) for i in lab_ids) if d is not None]]
     removed = 0
     keys: list[str] = []

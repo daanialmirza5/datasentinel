@@ -25,13 +25,15 @@ class RequestContextMiddleware:
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
                 headers = list(message.get("headers", []))
-                headers.extend([
-                    (b"x-request-id", request_id.encode()),
-                    (b"x-content-type-options", b"nosniff"),
-                    (b"x-frame-options", b"DENY"),
-                    (b"referrer-policy", b"no-referrer"),
-                    (b"cache-control", b"no-store"),
-                ])
+                headers.extend(
+                    [
+                        (b"x-request-id", request_id.encode()),
+                        (b"x-content-type-options", b"nosniff"),
+                        (b"x-frame-options", b"DENY"),
+                        (b"referrer-policy", b"no-referrer"),
+                        (b"cache-control", b"no-store"),
+                    ]
+                )
                 message["headers"] = headers
             await send(message)
 
@@ -63,8 +65,9 @@ class BodySizeLimitMiddleware:
                     await self._reject(scope, send, 400, "bad_request", "Invalid Content-Length header")
                     return
                 if declared > self.max_bytes:
-                    await self._reject(scope, send, 413, "payload_too_large",
-                                       f"Request body exceeds the {self.max_bytes} byte limit")
+                    await self._reject(
+                        scope, send, 413, "payload_too_large", f"Request body exceeds the {self.max_bytes} byte limit"
+                    )
                     return
 
         received = 0
@@ -89,18 +92,21 @@ class BodySizeLimitMiddleware:
             await self.app(scope, limited_receive, tracking_send)
         except _BodyTooLarge:
             if not response_started:
-                await self._reject(scope, send, 413, "payload_too_large",
-                                   f"Request body exceeds the {self.max_bytes} byte limit")
+                await self._reject(
+                    scope, send, 413, "payload_too_large", f"Request body exceeds the {self.max_bytes} byte limit"
+                )
 
     @staticmethod
     async def _reject(scope: Scope, send: Send, status: int, code: str, message: str) -> None:
         request_id = scope.get("state", {}).get("request_id")
         body = json.dumps({"error": {"code": code, "message": message}, "request_id": request_id}).encode()
-        await send({
-            "type": "http.response.start",
-            "status": status,
-            "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode())],
-        })
+        await send(
+            {
+                "type": "http.response.start",
+                "status": status,
+                "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode())],
+            }
+        )
         await send({"type": "http.response.body", "body": body})
 
 

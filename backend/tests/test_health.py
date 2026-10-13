@@ -48,9 +48,11 @@ def test_migrations_match_models(client):
 
 
 def test_cors_allows_only_configured_origins(client):
-    allowed = client.options("/api/v1/health", headers={
-        "Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"})
+    allowed = client.options(
+        "/api/v1/health", headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"}
+    )
     assert allowed.headers.get("access-control-allow-origin") == "http://localhost:5173"
-    denied = client.options("/api/v1/health", headers={
-        "Origin": "https://evil.example", "Access-Control-Request-Method": "GET"})
+    denied = client.options(
+        "/api/v1/health", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "GET"}
+    )
     assert "access-control-allow-origin" not in denied.headers

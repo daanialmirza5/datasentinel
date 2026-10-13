@@ -51,19 +51,22 @@ def _customers(rng: np.random.Generator, n: int = 600) -> list[dict[str, object]
     start = date(2023, 1, 1)
     for i in range(n):
         signup = start + timedelta(days=int(rng.integers(0, 1270)))
-        rows.append({
-            "customer_id": 1000 + i,
-            "email": f"customer{1000 + i}@example.com",
-            "country": str(rng.choice(COUNTRIES, p=COUNTRY_P)),
-            "segment": "business" if rng.random() < 0.22 else "consumer",
-            "signup_date": signup.isoformat(),
-            "lifetime_value": round(float(rng.lognormal(5.0, 0.8)), 2),
-        })
+        rows.append(
+            {
+                "customer_id": 1000 + i,
+                "email": f"customer{1000 + i}@example.com",
+                "country": str(rng.choice(COUNTRIES, p=COUNTRY_P)),
+                "segment": "business" if rng.random() < 0.22 else "consumer",
+                "signup_date": signup.isoformat(),
+                "lifetime_value": round(float(rng.lognormal(5.0, 0.8)), 2),
+            }
+        )
     return rows
 
 
-def _orders(rng: np.random.Generator, month: int, n: int, first_id: int, *, with_channel: bool,
-            ship_null_p: float = 0.015) -> list[dict[str, object]]:
+def _orders(
+    rng: np.random.Generator, month: int, n: int, first_id: int, *, with_channel: bool, ship_null_p: float = 0.015
+) -> list[dict[str, object]]:
     rows = []
     month_start = datetime(2026, month, 1, tzinfo=UTC)
     days_in_month = (datetime(2026, month + 1, 1, tzinfo=UTC) - month_start).days
@@ -96,8 +99,7 @@ def _orders(rng: np.random.Generator, month: int, n: int, first_id: int, *, with
     return rows
 
 
-def _plant_september_issues(rng: np.random.Generator,
-                            rows: list[dict[str, object]]) -> list[dict[str, object]]:
+def _plant_september_issues(rng: np.random.Generator, rows: list[dict[str, object]]) -> list[dict[str, object]]:
     for row in rows:
         if rng.random() < 0.18:
             row["ship_country"] = ""
@@ -135,16 +137,20 @@ def _products(rng: np.random.Generator, n: int = 150) -> list[dict[str, object]]
     rows = []
     for i in range(n):
         category = str(rng.choice(CATEGORIES))
-        rows.append({
-            "product_id": f"P-{i + 1:04d}",
-            "name": f"{category} item {i + 1}",
-            "category": category,
-            "price": round(float(rng.lognormal(3.3, 0.6)), 2),
-            "in_stock": bool(rng.random() < 0.85),
-            "launched_on": (date(2022, 1, 1) + timedelta(days=int(rng.integers(0, 1500)))).isoformat(),
-            "dimensions": {"weight_kg": round(float(rng.uniform(0.1, 12.0)), 2),
-                           "fragile": bool(rng.random() < 0.2)},
-        })
+        rows.append(
+            {
+                "product_id": f"P-{i + 1:04d}",
+                "name": f"{category} item {i + 1}",
+                "category": category,
+                "price": round(float(rng.lognormal(3.3, 0.6)), 2),
+                "in_stock": bool(rng.random() < 0.85),
+                "launched_on": (date(2022, 1, 1) + timedelta(days=int(rng.integers(0, 1500)))).isoformat(),
+                "dimensions": {
+                    "weight_kg": round(float(rng.uniform(0.1, 12.0)), 2),
+                    "fragile": bool(rng.random() < 0.2),
+                },
+            }
+        )
     return rows
 
 
@@ -159,13 +165,15 @@ def _sensor_readings(rng: np.random.Generator) -> list[dict[str, object]]:
             temp = base + 2.5 * np.sin(2 * np.pi * (ts.hour - 9) / 24) + float(rng.normal(0, 0.6))
             if device == "sensor-b" and ts in stuck:
                 temp = 85.0
-            rows.append({
-                "device_id": device,
-                "ts": ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                "temperature_c": round(temp, 2),
-                "humidity_pct": round(float(np.clip(rng.normal(45, 6), 5, 95)), 1),
-                "status": "ok" if rng.random() > 0.01 else "warn",
-            })
+            rows.append(
+                {
+                    "device_id": device,
+                    "ts": ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "temperature_c": round(temp, 2),
+                    "humidity_pct": round(float(np.clip(rng.normal(45, 6), 5, 95)), 1),
+                    "status": "ok" if rng.random() > 0.01 else "warn",
+                }
+            )
     return rows
 
 
@@ -210,9 +218,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     files = build_files()
     if args.check:
-        mismatched = [name for name, content in files.items()
-                      if not (DATA_DIR / name).exists()
-                      or digest((DATA_DIR / name).read_text(encoding="utf-8")) != digest(content)]
+        mismatched = [
+            name
+            for name, content in files.items()
+            if not (DATA_DIR / name).exists()
+            or digest((DATA_DIR / name).read_text(encoding="utf-8")) != digest(content)
+        ]
         for name in mismatched:
             print(f"MISMATCH {name}")
         print("ok" if not mismatched else f"{len(mismatched)} file(s) differ")

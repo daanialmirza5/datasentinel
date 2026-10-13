@@ -39,90 +39,114 @@ SEVERITIES = ("low", "medium", "high", "critical")
 
 RULE_TYPES: dict[str, dict[str, Any]] = {
     "column_exists": {
-        "label": "Column must exist", "requires_column": True, "scope": "schema",
+        "label": "Column must exist",
+        "requires_column": True,
+        "scope": "schema",
         "signal_category": "column_removed",
         "description": "Fails when the column is missing from the version.",
         "recommendation": "Inspect the most recent source schema change: '{column}' was expected but is absent. "
-                          "Check whether it was renamed or dropped upstream before downstream jobs read it.",
+        "Check whether it was renamed or dropped upstream before downstream jobs read it.",
     },
     "not_null": {
-        "label": "No missing values", "requires_column": True, "scope": "row",
+        "label": "No missing values",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "null_rate_increase",
         "description": "Share of missing values must not exceed max_null_pct (default 0%).",
         "recommendation": "Investigate why '{column}' has missing values: check the extraction query, joins that "
-                          "may not match, and optional fields in the source system.",
+        "may not match, and optional fields in the source system.",
     },
     "range": {
-        "label": "Numeric range", "requires_column": True, "scope": "row",
+        "label": "Numeric range",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "range_violation",
         "description": "Every non-missing value must be numeric and within [min, max].",
         "recommendation": "Validate the expected range of '{column}': inspect the offending rows for unit or "
-                          "scaling errors (e.g. cents vs. units) and for non-numeric values.",
+        "scaling errors (e.g. cents vs. units) and for non-numeric values.",
     },
     "expected_type": {
-        "label": "Expected type", "requires_column": True, "scope": "schema",
+        "label": "Expected type",
+        "requires_column": True,
+        "scope": "schema",
         "signal_category": "type_change",
         "description": "The column must have the expected data type and every value must conform to it.",
         "recommendation": "Compare the type of '{column}' with the previous version and the producer's schema; "
-                          "a type change often means a formatting change upstream (units, locales, quoting).",
+        "a type change often means a formatting change upstream (units, locales, quoting).",
     },
     "pattern": {
-        "label": "Matches pattern", "requires_column": True, "scope": "row",
+        "label": "Matches pattern",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "pattern_violation",
         "description": "Every non-missing value must match a regular expression.",
         "recommendation": "Review values of '{column}' that do not match the expected format and fix the "
-                          "producer or add an explicit normalisation step.",
+        "producer or add an explicit normalisation step.",
     },
     "unique": {
-        "label": "Unique values", "requires_column": True, "scope": "row",
+        "label": "Unique values",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "uniqueness_lost",
         "description": "Values (optionally a composite key) must not repeat.",
         "recommendation": "Look for duplicated records in '{column}': replayed batches, retried loads or "
-                          "fan-out joins are common causes. De-duplicate before downstream aggregation.",
+        "fan-out joins are common causes. De-duplicate before downstream aggregation.",
     },
     "allowed_values": {
-        "label": "Allowed values", "requires_column": True, "scope": "row",
+        "label": "Allowed values",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "new_category",
         "description": "Every non-missing value must belong to the configured set.",
         "recommendation": "Confirm whether the new values in '{column}' are legitimate (then extend the "
-                          "allowed set) or a mapping/encoding defect upstream.",
+        "allowed set) or a mapping/encoding defect upstream.",
     },
     "aggregate_range": {
-        "label": "Aggregate within limits", "requires_column": True, "scope": "dataset",
+        "label": "Aggregate within limits",
+        "requires_column": True,
+        "scope": "dataset",
         "signal_category": "distribution_shift",
         "description": "A column aggregate (mean, median, sum, min, max, std, null_pct, distinct_count) must "
-                       "stay within limits.",
+        "stay within limits.",
         "recommendation": "The aggregate of '{column}' moved outside its configured limits; compare the "
-                          "distribution with the previous version before trusting downstream metrics.",
+        "distribution with the previous version before trusting downstream metrics.",
     },
     "timestamp_range": {
-        "label": "Timestamp window", "requires_column": True, "scope": "row",
+        "label": "Timestamp window",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "timestamp_invalid",
         "description": "Timestamps must parse and fall within [min, max] and/or not lie too far in the future.",
         "recommendation": "Check '{column}' for unparseable, default (1970) or future-dated timestamps; verify "
-                          "time-zone handling and date formats in the producer.",
+        "time-zone handling and date formats in the producer.",
     },
     "row_count": {
-        "label": "Row count", "requires_column": False, "scope": "dataset",
+        "label": "Row count",
+        "requires_column": False,
+        "scope": "dataset",
         "signal_category": "row_count_change",
         "description": "The number of rows must be within [min, max].",
         "recommendation": "Row volume is outside the expected bounds: check for partial loads, filters "
-                          "applied upstream, or duplicated batches.",
+        "applied upstream, or duplicated batches.",
     },
     "column_comparison": {
-        "label": "Column relationship", "requires_column": True, "scope": "row",
+        "label": "Column relationship",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "relationship_violation",
         "description": "For rows where both values are present, '<column> <operator> <other_column>' must hold "
-                       "(numeric or datetime columns).",
+        "(numeric or datetime columns).",
         "recommendation": "Rows violate the documented relationship between '{column}' and the compared column; "
-                          "check transformation logic and the order of event timestamps.",
+        "check transformation logic and the order of event timestamps.",
     },
     "foreign_key": {
-        "label": "Referential integrity", "requires_column": True, "scope": "row",
+        "label": "Referential integrity",
+        "requires_column": True,
+        "scope": "row",
         "signal_category": "referential_integrity",
         "description": "Every non-missing value must exist in a column of another dataset's current version.",
         "recommendation": "Values in '{column}' reference records that do not exist in the reference dataset: "
-                          "check load ordering between the datasets and whether reference data is stale.",
+        "check load ordering between the datasets and whether reference data is stale.",
     },
 }
 
@@ -185,16 +209,26 @@ def _examples(table: LoadedTable, mask: np.ndarray | pd.Series, columns: list[st
     return [{"row": int(index) + 1, "values": {c: rows.at[index, c] for c in columns}} for index in rows.index]
 
 
-def _row_outcome(table: LoadedTable, evaluated: pd.Series, violations: pd.Series, columns: list[str],
-                 ctx: EvalContext, describe: str, **details: Any) -> RuleOutcome:
+def _row_outcome(
+    table: LoadedTable,
+    evaluated: pd.Series,
+    violations: pd.Series,
+    columns: list[str],
+    ctx: EvalContext,
+    describe: str,
+    **details: Any,
+) -> RuleOutcome:
     evaluated_count = int(evaluated.sum())
     if evaluated_count == 0:
         return _not_evaluated("No non-missing values to evaluate.")
     violation_mask = (violations & evaluated).to_numpy(dtype=bool)
     count = int(violation_mask.sum())
     outcome = RuleOutcome("failed" if count else "passed", evaluated_count, count, details=details)
-    outcome.message = (f"{count} of {evaluated_count} values {describe}." if count
-                       else f"All {evaluated_count} values satisfy the rule.")
+    outcome.message = (
+        f"{count} of {evaluated_count} values {describe}."
+        if count
+        else f"All {evaluated_count} values satisfy the rule."
+    )
     outcome.examples = _examples(table, violation_mask, columns, ctx.example_limit)
     return outcome
 
@@ -233,8 +267,12 @@ def _conforms(raw: pd.Series, data_type: str) -> pd.Series:
 
 def _column_exists(spec: RuleSpec, ctx: EvalContext, _p: P.ColumnExistsParams) -> RuleOutcome:
     present = spec.column in ctx.table.raw.columns
-    return RuleOutcome("passed" if present else "failed", 1, 0 if present else 1,
-                       message=f"Column '{spec.column}' is {'present' if present else 'missing'}.")
+    return RuleOutcome(
+        "passed" if present else "failed",
+        1,
+        0 if present else 1,
+        message=f"Column '{spec.column}' is {'present' if present else 'missing'}.",
+    )
 
 
 def _not_null(spec: RuleSpec, ctx: EvalContext, p: P.NotNullParams) -> RuleOutcome:
@@ -247,8 +285,7 @@ def _not_null(spec: RuleSpec, ctx: EvalContext, p: P.NotNullParams) -> RuleOutco
     pct = 100.0 * count / total
     status = "passed" if pct <= p.max_null_pct else "failed"
     outcome = RuleOutcome(status, total, count, details={"null_pct": round(pct, 4), "max_null_pct": p.max_null_pct})
-    outcome.message = (f"{count} of {total} rows ({pct:.2f}%) are missing '{spec.column}' "
-                       f"(allowed: {p.max_null_pct}%).")
+    outcome.message = f"{count} of {total} rows ({pct:.2f}%) are missing '{spec.column}' (allowed: {p.max_null_pct}%)."
     if status == "failed":
         outcome.examples = _examples(ctx.table, nulls.to_numpy(), [spec.column], ctx.example_limit)
     return outcome
@@ -265,9 +302,16 @@ def _range(spec: RuleSpec, ctx: EvalContext, p: P.RangeParams) -> RuleOutcome:
         out_of_range |= (numbers > p.max) if p.inclusive else (numbers >= p.max)
     non_numeric = evaluated & numbers.isna()
     bounds = f"[{'-inf' if p.min is None else p.min}, {'inf' if p.max is None else p.max}]"
-    return _row_outcome(ctx.table, evaluated, out_of_range.fillna(False) | non_numeric, [spec.column], ctx,
-                        f"are non-numeric or outside {bounds}", non_numeric=int(non_numeric.sum()),
-                        out_of_range=int((out_of_range.fillna(False) & evaluated).sum()))
+    return _row_outcome(
+        ctx.table,
+        evaluated,
+        out_of_range.fillna(False) | non_numeric,
+        [spec.column],
+        ctx,
+        f"are non-numeric or outside {bounds}",
+        non_numeric=int(non_numeric.sum()),
+        out_of_range=int((out_of_range.fillna(False) & evaluated).sum()),
+    )
 
 
 def _expected_type(spec: RuleSpec, ctx: EvalContext, p: P.ExpectedTypeParams) -> RuleOutcome:
@@ -280,8 +324,16 @@ def _expected_type(spec: RuleSpec, ctx: EvalContext, p: P.ExpectedTypeParams) ->
     evaluated = raw.notna()
     check_type = "float" if (p.type == "float" and p.allow_integer_as_float) else p.type
     violations = evaluated & ~_conforms(raw, check_type)
-    outcome = _row_outcome(ctx.table, evaluated, violations, [spec.column], ctx,
-                           f"do not conform to {p.type}", inferred_type=actual, expected_type=p.type)
+    outcome = _row_outcome(
+        ctx.table,
+        evaluated,
+        violations,
+        [spec.column],
+        ctx,
+        f"do not conform to {p.type}",
+        inferred_type=actual,
+        expected_type=p.type,
+    )
     if not compatible:
         outcome.status = "failed"
         outcome.message = f"Column '{spec.column}' is inferred as {actual}, expected {p.type}. " + outcome.message
@@ -305,11 +357,13 @@ def _pattern(spec: RuleSpec, ctx: EvalContext, p: P.PatternParams) -> RuleOutcom
                 raise TimeoutError
             matches[value] = matcher(value, timeout=remaining) is not None
     except TimeoutError:
-        return RuleOutcome("error", message=f"Pattern evaluation exceeded {ctx.regex_timeout_seconds}s and was "
-                                            "aborted; simplify the regular expression.")
+        return RuleOutcome(
+            "error",
+            message=f"Pattern evaluation exceeded {ctx.regex_timeout_seconds}s and was "
+            "aborted; simplify the regular expression.",
+        )
     violations = raw.map(lambda v: v is not None and not matches.get(str(v), True))
-    return _row_outcome(ctx.table, evaluated, violations.astype(bool), [spec.column], ctx,
-                        f"do not match /{p.regex}/")
+    return _row_outcome(ctx.table, evaluated, violations.astype(bool), [spec.column], ctx, f"do not match /{p.regex}/")
 
 
 def _unique(spec: RuleSpec, ctx: EvalContext, p: P.UniqueParams) -> RuleOutcome:
@@ -335,8 +389,15 @@ def _allowed_values(spec: RuleSpec, ctx: EvalContext, p: P.AllowedValuesParams) 
         allowed = {v.lower() for v in p.values}
         violations = evaluated & ~raw.astype("string").str.lower().isin(allowed).fillna(False).astype(bool)
     unexpected = raw[violations].astype(str).value_counts().head(20)
-    return _row_outcome(ctx.table, evaluated, violations, [spec.column], ctx, "are not in the allowed set",
-                        unexpected_values={str(k): int(v) for k, v in unexpected.items()})
+    return _row_outcome(
+        ctx.table,
+        evaluated,
+        violations,
+        [spec.column],
+        ctx,
+        "are not in the allowed set",
+        unexpected_values={str(k): int(v) for k, v in unexpected.items()},
+    )
 
 
 def _aggregate_range(spec: RuleSpec, ctx: EvalContext, p: P.AggregateRangeParams) -> RuleOutcome:
@@ -357,10 +418,14 @@ def _aggregate_range(spec: RuleSpec, ctx: EvalContext, p: P.AggregateRangeParams
     low_ok = p.min is None or value >= p.min
     high_ok = p.max is None or value <= p.max
     ok = low_ok and high_ok
-    return RuleOutcome("passed" if ok else "failed", 1, 0 if ok else 1,
-                       message=f"{p.aggregate}({spec.column}) = {value:.6g}; allowed "
-                               f"[{'-inf' if p.min is None else p.min}, {'inf' if p.max is None else p.max}].",
-                       details={"value": value, "aggregate": p.aggregate})
+    return RuleOutcome(
+        "passed" if ok else "failed",
+        1,
+        0 if ok else 1,
+        message=f"{p.aggregate}({spec.column}) = {value:.6g}; allowed "
+        f"[{'-inf' if p.min is None else p.min}, {'inf' if p.max is None else p.max}].",
+        details={"value": value, "aggregate": p.aggregate},
+    )
 
 
 def _timestamp_range(spec: RuleSpec, ctx: EvalContext, p: P.TimestampRangeParams) -> RuleOutcome:
@@ -380,17 +445,28 @@ def _timestamp_range(spec: RuleSpec, ctx: EvalContext, p: P.TimestampRangeParams
         bad |= (stamps > as_utc(p.max)).fillna(False)
     if p.max_future_days is not None:
         bad |= (stamps > as_utc(ctx.now + timedelta(days=p.max_future_days))).fillna(False)
-    return _row_outcome(ctx.table, evaluated, bad.astype(bool), [spec.column], ctx,
-                        "are unparseable or outside the allowed window", unparseable=int(unparseable.sum()))
+    return _row_outcome(
+        ctx.table,
+        evaluated,
+        bad.astype(bool),
+        [spec.column],
+        ctx,
+        "are unparseable or outside the allowed window",
+        unparseable=int(unparseable.sum()),
+    )
 
 
 def _row_count(_spec: RuleSpec, ctx: EvalContext, p: P.RowCountParams) -> RuleOutcome:
     rows = len(ctx.table.raw)
     ok = (p.min is None or rows >= p.min) and (p.max is None or rows <= p.max)
-    return RuleOutcome("passed" if ok else "failed", 1, 0 if ok else 1,
-                       message=f"Version has {rows} rows; allowed "
-                               f"[{p.min if p.min is not None else 0}, {p.max if p.max is not None else 'inf'}].",
-                       details={"row_count": rows})
+    return RuleOutcome(
+        "passed" if ok else "failed",
+        1,
+        0 if ok else 1,
+        message=f"Version has {rows} rows; allowed "
+        f"[{p.min if p.min is not None else 0}, {p.max if p.max is not None else 'inf'}].",
+        details={"row_count": rows},
+    )
 
 
 def _column_comparison(spec: RuleSpec, ctx: EvalContext, p: P.ColumnComparisonParams) -> RuleOutcome:
@@ -410,9 +486,15 @@ def _column_comparison(spec: RuleSpec, ctx: EvalContext, p: P.ColumnComparisonPa
     both_present = ctx.table.raw[spec.column].notna() & ctx.table.raw[p.other_column].notna()
     evaluated = left.notna() & right.notna()
     holds = pd.Series(op(left, right), index=left.index).fillna(False).astype(bool)
-    return _row_outcome(ctx.table, evaluated, ~holds, [spec.column, p.other_column], ctx,
-                        f"violate {spec.column} {symbol} {p.other_column}",
-                        unparseable_rows=int((both_present & ~evaluated).sum()))
+    return _row_outcome(
+        ctx.table,
+        evaluated,
+        ~holds,
+        [spec.column, p.other_column],
+        ctx,
+        f"violate {spec.column} {symbol} {p.other_column}",
+        unparseable_rows=int((both_present & ~evaluated).sum()),
+    )
 
 
 def _canonical_keys(series: pd.Series) -> pd.Series:
@@ -428,8 +510,10 @@ def _canonical_keys(series: pd.Series) -> pd.Series:
 def _foreign_key(spec: RuleSpec, ctx: EvalContext, p: P.ForeignKeyParams) -> RuleOutcome:
     reference = ctx.resolve_reference(p.reference_dataset_id)
     if reference is None:
-        return _not_evaluated("Reference dataset is unavailable, so referential integrity was not checked.",
-                              reference_dataset_id=p.reference_dataset_id)
+        return _not_evaluated(
+            "Reference dataset is unavailable, so referential integrity was not checked.",
+            reference_dataset_id=p.reference_dataset_id,
+        )
     if p.reference_column not in reference.raw.columns:
         return _not_evaluated(f"Reference column '{p.reference_column}' is not present in the reference dataset.")
     allowed = set(_canonical_keys(reference.raw[p.reference_column].dropna()))
@@ -438,10 +522,16 @@ def _foreign_key(spec: RuleSpec, ctx: EvalContext, p: P.ForeignKeyParams) -> Rul
     keys = _canonical_keys(raw)
     violations = evaluated & ~keys.isin(allowed)
     orphans = raw[violations].astype(str).value_counts().head(20)
-    return _row_outcome(ctx.table, evaluated, violations, [spec.column], ctx,
-                        "have no matching record in the reference dataset",
-                        orphan_values={str(k): int(v) for k, v in orphans.items()},
-                        reference_keys=len(allowed))
+    return _row_outcome(
+        ctx.table,
+        evaluated,
+        violations,
+        [spec.column],
+        ctx,
+        "have no matching record in the reference dataset",
+        orphan_values={str(k): int(v) for k, v in orphans.items()},
+        reference_keys=len(allowed),
+    )
 
 
 EVALUATORS: dict[str, Callable[[RuleSpec, EvalContext, Any], RuleOutcome]] = {

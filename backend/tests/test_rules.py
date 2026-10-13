@@ -21,8 +21,9 @@ def table(content=ORDERS):
 
 
 def run(rule_type, column=None, ctx_table=None, **params):
-    ctx = EvalContext(table=ctx_table or table(),
-                      resolve_reference=lambda ds: table(CUSTOMERS) if ds == "customers" else None)
+    ctx = EvalContext(
+        table=ctx_table or table(), resolve_reference=lambda ds: table(CUSTOMERS) if ds == "customers" else None
+    )
     return evaluate(RuleSpec(rule_type, column, params), ctx)
 
 
@@ -138,13 +139,22 @@ def test_invalid_params_produce_error_status():
 def test_rule_crud_and_validation_run(client):
     ds = import_ok(client, ORDERS_CSV, dataset_name="orders")["dataset"]
     base = f"/api/v1/datasets/{ds['id']}"
-    created = client.post(f"{base}/rules", json={
-        "name": "amount present", "rule_type": "not_null", "column_name": "amount", "severity": "high"})
+    created = client.post(
+        f"{base}/rules",
+        json={"name": "amount present", "rule_type": "not_null", "column_name": "amount", "severity": "high"},
+    )
     assert created.status_code == 201, created.text
     rule = created.json()
     assert rule["params"] == {"max_null_pct": 0.0}
-    client.post(f"{base}/rules", json={"name": "status set", "rule_type": "allowed_values",
-                                       "column_name": "status", "params": {"values": ["paid", "refunded"]}})
+    client.post(
+        f"{base}/rules",
+        json={
+            "name": "status set",
+            "rule_type": "allowed_values",
+            "column_name": "status",
+            "params": {"values": ["paid", "refunded"]},
+        },
+    )
 
     run_body = client.post(f"{base}/validate").json()
     assert run_body["summary"]["total"] == 2
@@ -168,8 +178,9 @@ def test_rule_crud_and_validation_run(client):
 
 def test_rules_run_automatically_on_new_versions(client):
     ds = import_ok(client, ORDERS_CSV, dataset_name="orders")["dataset"]
-    client.post(f"/api/v1/datasets/{ds['id']}/rules", json={
-        "name": "rows", "rule_type": "row_count", "params": {"min": 5}})
+    client.post(
+        f"/api/v1/datasets/{ds['id']}/rules", json={"name": "rows", "rule_type": "row_count", "params": {"min": 5}}
+    )
     import_ok(client, ORDERS_CSV + b"5,1.0,paid\n", dataset_id=ds["id"])
     runs = client.get(f"/api/v1/datasets/{ds['id']}/validations").json()
     assert runs[0]["trigger"] == "import" and runs[0]["summary"]["passed"] == 1
@@ -178,15 +189,25 @@ def test_rules_run_automatically_on_new_versions(client):
 def test_rule_validation_errors(client):
     ds = import_ok(client, ORDERS_CSV, dataset_name="orders")["dataset"]
     url = f"/api/v1/datasets/{ds['id']}/rules"
-    assert client.post(url, json={"name": "x", "rule_type": "range", "column_name": "amount",
-                                  "params": {}}).status_code == 422
+    assert (
+        client.post(url, json={"name": "x", "rule_type": "range", "column_name": "amount", "params": {}}).status_code
+        == 422
+    )
     assert client.post(url, json={"name": "x", "rule_type": "not_null"}).status_code == 422
     assert client.post(url, json={"name": "x", "rule_type": "teleport", "column_name": "a"}).status_code == 422
-    assert client.post(url, json={"name": "x", "rule_type": "foreign_key", "column_name": "amount",
-                                  "params": {"reference_dataset_id": "ds_nope",
-                                             "reference_column": "id"}}).status_code == 422
-    assert client.post(f"/api/v1/datasets/{ds['id']}/validate",
-                       json={"rule_ids": ["rule_unknown"]}).status_code == 422
+    assert (
+        client.post(
+            url,
+            json={
+                "name": "x",
+                "rule_type": "foreign_key",
+                "column_name": "amount",
+                "params": {"reference_dataset_id": "ds_nope", "reference_column": "id"},
+            },
+        ).status_code
+        == 422
+    )
+    assert client.post(f"/api/v1/datasets/{ds['id']}/validate", json={"rule_ids": ["rule_unknown"]}).status_code == 422
 
 
 def test_rule_types_catalogue_and_suggestions(client):

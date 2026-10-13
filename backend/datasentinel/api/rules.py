@@ -20,8 +20,20 @@ from datasentinel.services.validation import run_validation, suggest_rules
 
 router = APIRouter(tags=["rules"])
 
-RuleType = Literal["column_exists", "not_null", "range", "expected_type", "pattern", "unique", "allowed_values",
-                   "aggregate_range", "timestamp_range", "row_count", "column_comparison", "foreign_key"]
+RuleType = Literal[
+    "column_exists",
+    "not_null",
+    "range",
+    "expected_type",
+    "pattern",
+    "unique",
+    "allowed_values",
+    "aggregate_range",
+    "timestamp_range",
+    "row_count",
+    "column_comparison",
+    "foreign_key",
+]
 Severity = Literal["low", "medium", "high", "critical"]
 
 
@@ -99,8 +111,9 @@ class ValidateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     version_id: str | None = None
-    rule_ids: list[str] | None = Field(default=None, max_length=500,
-                                       description="Run only these rules (enabled or not). Default: all enabled.")
+    rule_ids: list[str] | None = Field(
+        default=None, max_length=500, description="Run only these rules (enabled or not). Default: all enabled."
+    )
 
 
 def _validated_params(session: Session, rule_type: str, column: str | None, params: dict[str, Any]) -> dict[str, Any]:
@@ -110,9 +123,11 @@ def _validated_params(session: Session, rule_type: str, column: str | None, para
         model = PARAM_MODELS[rule_type].model_validate(params)
     except ValueError as exc:
         errors = getattr(exc, "errors", lambda: [])()
-        raise ValidationFailed("Invalid rule parameters", details=[
-            {"location": [str(p) for p in e.get("loc", ())], "message": e.get("msg")} for e in errors]
-            or str(exc)) from exc
+        raise ValidationFailed(
+            "Invalid rule parameters",
+            details=[{"location": [str(p) for p in e.get("loc", ())], "message": e.get("msg")} for e in errors]
+            or str(exc),
+        ) from exc
     if rule_type == "foreign_key" and session.get(Dataset, params["reference_dataset_id"]) is None:
         raise ValidationFailed("reference_dataset_id does not exist")
     return model.model_dump(mode="json")
@@ -130,9 +145,14 @@ def run_out(session: Session, run: ValidationRun, include_results: bool = True) 
 
     version = session.get(DatasetVersion, run.version_id)
     return ValidationRunOut(
-        id=run.id, dataset_id=run.dataset_id, version_id=run.version_id,
-        version_number=version.version_number if version else None, trigger=run.trigger,
-        started_at=run.started_at, finished_at=run.finished_at, summary=run.summary,
+        id=run.id,
+        dataset_id=run.dataset_id,
+        version_id=run.version_id,
+        version_number=version.version_number if version else None,
+        trigger=run.trigger,
+        started_at=run.started_at,
+        finished_at=run.finished_at,
+        summary=run.summary,
         results=[RuleResultOut.model_validate(r) for r in run.results] if include_results else None,
     )
 
@@ -143,9 +163,14 @@ def rule_types() -> dict[str, Any]:
     return {
         "severities": list(SEVERITIES),
         "types": [
-            {"rule_type": key, "label": meta["label"], "description": meta["description"],
-             "requires_column": meta["requires_column"], "scope": meta["scope"],
-             "params_schema": PARAM_MODELS[key].model_json_schema()}
+            {
+                "rule_type": key,
+                "label": meta["label"],
+                "description": meta["description"],
+                "requires_column": meta["requires_column"],
+                "scope": meta["scope"],
+                "params_schema": PARAM_MODELS[key].model_json_schema(),
+            }
             for key, meta in RULE_TYPES.items()
         ],
     }
@@ -162,17 +187,25 @@ def create_rule(dataset_id: str, body: RuleIn, session: Session = Depends(get_db
     dataset = ds.get_dataset(session, dataset_id)
     column = body.column_name if RULE_TYPES[body.rule_type]["requires_column"] else None
     params = _validated_params(session, body.rule_type, column, body.params)
-    rule = QualityRule(dataset_id=dataset.id, name=body.name.strip(), rule_type=body.rule_type,
-                       column_name=column, params=params, severity=body.severity, enabled=body.enabled,
-                       description=body.description.strip())
+    rule = QualityRule(
+        dataset_id=dataset.id,
+        name=body.name.strip(),
+        rule_type=body.rule_type,
+        column_name=column,
+        params=params,
+        severity=body.severity,
+        enabled=body.enabled,
+        description=body.description.strip(),
+    )
     session.add(rule)
     session.flush()
     return RuleOut.model_validate(rule)
 
 
 @router.get("/datasets/{dataset_id}/rules/suggestions")
-def rule_suggestions(dataset_id: str, session: Session = Depends(get_db),
-                     settings: Settings = Depends(get_settings_dep)) -> dict[str, Any]:
+def rule_suggestions(
+    dataset_id: str, session: Session = Depends(get_db), settings: Settings = Depends(get_settings_dep)
+) -> dict[str, Any]:
     """Rules suggested from the current version's profile. Nothing is created until you POST one."""
     dataset = ds.get_dataset(session, dataset_id)
     version = ds.resolve_version(session, dataset, None)
@@ -209,8 +242,12 @@ def delete_rule(rule_id: str, session: Session = Depends(get_db)) -> dict[str, A
 
 
 @router.post("/datasets/{dataset_id}/validate", response_model=ValidationRunOut)
-def validate(dataset_id: str, body: ValidateRequest | None = None, session: Session = Depends(get_db),
-             settings: Settings = Depends(get_settings_dep)) -> ValidationRunOut:
+def validate(
+    dataset_id: str,
+    body: ValidateRequest | None = None,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings_dep),
+) -> ValidationRunOut:
     """Run the dataset's enabled rules (or the listed rules) against a version and store the results."""
     body = body or ValidateRequest()
     dataset = ds.get_dataset(session, dataset_id)
@@ -225,9 +262,12 @@ def validate(dataset_id: str, body: ValidateRequest | None = None, session: Sess
 
 
 @router.get("/datasets/{dataset_id}/validations", response_model=list[ValidationRunOut])
-def list_validations(dataset_id: str, version_id: str | None = None,
-                     limit: Annotated[int, Query(ge=1, le=100)] = 20,
-                     session: Session = Depends(get_db)) -> list[ValidationRunOut]:
+def list_validations(
+    dataset_id: str,
+    version_id: str | None = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    session: Session = Depends(get_db),
+) -> list[ValidationRunOut]:
     dataset = ds.get_dataset(session, dataset_id)
     query = select(ValidationRun).where(ValidationRun.dataset_id == dataset.id)
     if version_id:

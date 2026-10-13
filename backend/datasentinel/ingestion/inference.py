@@ -38,8 +38,15 @@ _FLOAT_RE = r"[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?"
 _LEADING_ZERO_RE = r"[+-]?0\d+"
 _DATE_PREFILTER = re.compile(r"^(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}[/.]\d{1,2}[/.]\d{2,4}|\d{4}/\d{1,2}/\d{1,2})")
 _ALT_DATE_FORMATS = (
-    "%m/%d/%Y", "%d/%m/%Y", "%Y/%m/%d", "%m/%d/%Y %H:%M", "%d/%m/%Y %H:%M", "%m/%d/%Y %H:%M:%S",
-    "%d/%m/%Y %H:%M:%S", "%d.%m.%Y", "%d.%m.%Y %H:%M",
+    "%m/%d/%Y",
+    "%d/%m/%Y",
+    "%Y/%m/%d",
+    "%m/%d/%Y %H:%M",
+    "%d/%m/%Y %H:%M",
+    "%m/%d/%Y %H:%M:%S",
+    "%d/%m/%Y %H:%M:%S",
+    "%d.%m.%Y",
+    "%d.%m.%Y %H:%M",
 )
 
 
@@ -93,9 +100,9 @@ def _best_datetime_format(values: pd.Series) -> tuple[str | None, float, bool]:
         for fmt in _ALT_DATE_FORMATS:
             scores[fmt] = float(parse_datetimes(sample, fmt).notna().mean())
     best = max(scores, key=lambda key: scores[key])
-    ambiguous = (
-        best == "%m/%d/%Y" and scores.get("%d/%m/%Y", 0.0) >= CONFORMANCE_THRESHOLD
-    ) or (best == "%m/%d/%Y %H:%M" and scores.get("%d/%m/%Y %H:%M", 0.0) >= CONFORMANCE_THRESHOLD)
+    ambiguous = (best == "%m/%d/%Y" and scores.get("%d/%m/%Y", 0.0) >= CONFORMANCE_THRESHOLD) or (
+        best == "%m/%d/%Y %H:%M" and scores.get("%d/%m/%Y %H:%M", 0.0) >= CONFORMANCE_THRESHOLD
+    )
     return best, scores[best], ambiguous
 
 
