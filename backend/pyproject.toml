@@ -30,6 +30,7 @@ ignore = [
   "B008",   # FastAPI Depends() in defaults is idiomatic
   "RUF012", # mutable class attributes in pydantic/sqlalchemy models
   "E501",   # line length is handled by ruff format; long literal strings are allowed
+  "RUF005", # list concatenation is clearer than unpacking in the report builder
   "SIM108", # if/else blocks are often clearer than ternaries
   "RUF001", "RUF002", "RUF003", # typographic unicode in prose is intentional
 ]

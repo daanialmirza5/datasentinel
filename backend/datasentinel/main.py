@@ -7,15 +7,31 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import func, select
 
 from datasentinel import __version__
-from datasentinel.api import datasets, drift, experiments, health, lineage, rules
+from datasentinel.api import datasets, drift, experiments, health, lineage, reports, rules, system
 from datasentinel.config import Settings, get_settings
-from datasentinel.db import build_engine, make_session_factory, run_migrations
+from datasentinel.db import build_engine, make_session_factory, run_migrations, session_scope
 from datasentinel.errors import install_error_handlers
 from datasentinel.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
+from datasentinel.models import Dataset
+from datasentinel.samples.workspace import load_demo_workspace
+from datasentinel.services.experiments import purge_expired
 
 API_PREFIX = "/api/v1"
+logger = logging.getLogger("datasentinel")
+
+
+def _startup_tasks(app: FastAPI, settings: Settings) -> None:
+    """Apply retention and optionally seed the demo workspace into an empty database."""
+    with session_scope(app.state.session_factory) as session:
+        removed = purge_expired(session, settings)
+        if removed:
+            logger.info("Retention: removed %d expired experiment(s)", removed)
+        if settings.load_samples_on_startup and session.scalar(select(func.count()).select_from(Dataset)) == 0:
+            summary = load_demo_workspace(session, settings)
+            logger.info("Loaded demo workspace: %s datasets, %s versions", summary["datasets"], summary["versions"])
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -30,6 +46,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         settings.storage_dir.mkdir(parents=True, exist_ok=True)
         if settings.auto_migrate:
             run_migrations(engine)
+            _startup_tasks(app, settings)
         yield
         engine.dispose()
 
@@ -66,6 +83,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(drift.router, prefix=API_PREFIX)
     app.include_router(lineage.router, prefix=API_PREFIX)
     app.include_router(experiments.router, prefix=API_PREFIX)
+    app.include_router(reports.router, prefix=API_PREFIX)
+    app.include_router(system.router, prefix=API_PREFIX)
     return app
 
 
