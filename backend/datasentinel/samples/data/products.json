@@ -1,0 +1,1802 @@
+[
+ {
+  "product_id": "P-0001",
+  "name": "Home item 1",
+  "category": "Home",
+  "price": 14.87,
+  "in_stock": false,
+  "launched_on": "2023-03-04",
+  "dimensions": {
+   "weight_kg": 1.56,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0002",
+  "name": "Books item 2",
+  "category": "Books",
+  "price": 48.47,
+  "in_stock": true,
+  "launched_on": "2025-12-19",
+  "dimensions": {
+   "weight_kg": 2.4,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0003",
+  "name": "Electronics item 3",
+  "category": "Electronics",
+  "price": 40.89,
+  "in_stock": true,
+  "launched_on": "2025-04-25",
+  "dimensions": {
+   "weight_kg": 7.86,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0004",
+  "name": "Books item 4",
+  "category": "Books",
+  "price": 29.02,
+  "in_stock": true,
+  "launched_on": "2024-04-18",
+  "dimensions": {
+   "weight_kg": 5.4,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0005",
+  "name": "Home item 5",
+  "category": "Home",
+  "price": 21.72,
+  "in_stock": true,
+  "launched_on": "2026-01-19",
+  "dimensions": {
+   "weight_kg": 0.44,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0006",
+  "name": "Toys item 6",
+  "category": "Toys",
+  "price": 33.71,
+  "in_stock": true,
+  "launched_on": "2025-11-04",
+  "dimensions": {
+   "weight_kg": 0.26,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0007",
+  "name": "Electronics item 7",
+  "category": "Electronics",
+  "price": 29.48,
+  "in_stock": true,
+  "launched_on": "2024-03-21",
+  "dimensions": {
+   "weight_kg": 8.85,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0008",
+  "name": "Electronics item 8",
+  "category": "Electronics",
+  "price": 62.22,
+  "in_stock": true,
+  "launched_on": "2022-09-19",
+  "dimensions": {
+   "weight_kg": 2.15,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0009",
+  "name": "Garden item 9",
+  "category": "Garden",
+  "price": 40.96,
+  "in_stock": true,
+  "launched_on": "2025-09-04",
+  "dimensions": {
+   "weight_kg": 11.87,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0010",
+  "name": "Toys item 10",
+  "category": "Toys",
+  "price": 16.99,
+  "in_stock": true,
+  "launched_on": "2024-09-19",
+  "dimensions": {
+   "weight_kg": 5.51,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0011",
+  "name": "Books item 11",
+  "category": "Books",
+  "price": 36.5,
+  "in_stock": true,
+  "launched_on": "2022-11-26",
+  "dimensions": {
+   "weight_kg": 8.96,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0012",
+  "name": "Books item 12",
+  "category": "Books",
+  "price": 19.34,
+  "in_stock": true,
+  "launched_on": "2023-09-14",
+  "dimensions": {
+   "weight_kg": 3.58,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0013",
+  "name": "Electronics item 13",
+  "category": "Electronics",
+  "price": 30.92,
+  "in_stock": true,
+  "launched_on": "2023-01-25",
+  "dimensions": {
+   "weight_kg": 1.53,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0014",
+  "name": "Garden item 14",
+  "category": "Garden",
+  "price": 19.59,
+  "in_stock": true,
+  "launched_on": "2023-01-04",
+  "dimensions": {
+   "weight_kg": 4.21,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0015",
+  "name": "Garden item 15",
+  "category": "Garden",
+  "price": 15.78,
+  "in_stock": true,
+  "launched_on": "2022-12-19",
+  "dimensions": {
+   "weight_kg": 11.91,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0016",
+  "name": "Garden item 16",
+  "category": "Garden",
+  "price": 13.16,
+  "in_stock": true,
+  "launched_on": "2022-02-14",
+  "dimensions": {
+   "weight_kg": 3.01,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0017",
+  "name": "Books item 17",
+  "category": "Books",
+  "price": 17.23,
+  "in_stock": true,
+  "launched_on": "2022-12-04",
+  "dimensions": {
+   "weight_kg": 9.44,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0018",
+  "name": "Home item 18",
+  "category": "Home",
+  "price": 32.91,
+  "in_stock": true,
+  "launched_on": "2022-09-09",
+  "dimensions": {
+   "weight_kg": 5.96,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0019",
+  "name": "Books item 19",
+  "category": "Books",
+  "price": 36.6,
+  "in_stock": true,
+  "launched_on": "2023-07-08",
+  "dimensions": {
+   "weight_kg": 5.62,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0020",
+  "name": "Garden item 20",
+  "category": "Garden",
+  "price": 23.1,
+  "in_stock": true,
+  "launched_on": "2022-04-23",
+  "dimensions": {
+   "weight_kg": 10.71,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0021",
+  "name": "Books item 21",
+  "category": "Books",
+  "price": 48.61,
+  "in_stock": true,
+  "launched_on": "2024-06-13",
+  "dimensions": {
+   "weight_kg": 8.78,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0022",
+  "name": "Toys item 22",
+  "category": "Toys",
+  "price": 8.59,
+  "in_stock": false,
+  "launched_on": "2023-09-28",
+  "dimensions": {
+   "weight_kg": 6.41,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0023",
+  "name": "Electronics item 23",
+  "category": "Electronics",
+  "price": 86.93,
+  "in_stock": true,
+  "launched_on": "2023-08-05",
+  "dimensions": {
+   "weight_kg": 8.53,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0024",
+  "name": "Electronics item 24",
+  "category": "Electronics",
+  "price": 46.36,
+  "in_stock": true,
+  "launched_on": "2024-03-08",
+  "dimensions": {
+   "weight_kg": 3.23,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0025",
+  "name": "Garden item 25",
+  "category": "Garden",
+  "price": 32.61,
+  "in_stock": true,
+  "launched_on": "2023-06-17",
+  "dimensions": {
+   "weight_kg": 0.78,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0026",
+  "name": "Books item 26",
+  "category": "Books",
+  "price": 18.65,
+  "in_stock": true,
+  "launched_on": "2024-11-25",
+  "dimensions": {
+   "weight_kg": 3.01,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0027",
+  "name": "Books item 27",
+  "category": "Books",
+  "price": 70.17,
+  "in_stock": true,
+  "launched_on": "2025-08-09",
+  "dimensions": {
+   "weight_kg": 7.28,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0028",
+  "name": "Electronics item 28",
+  "category": "Electronics",
+  "price": 27.27,
+  "in_stock": true,
+  "launched_on": "2024-03-21",
+  "dimensions": {
+   "weight_kg": 4.84,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0029",
+  "name": "Garden item 29",
+  "category": "Garden",
+  "price": 30.33,
+  "in_stock": true,
+  "launched_on": "2023-02-12",
+  "dimensions": {
+   "weight_kg": 8.94,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0030",
+  "name": "Home item 30",
+  "category": "Home",
+  "price": 19.28,
+  "in_stock": false,
+  "launched_on": "2025-05-09",
+  "dimensions": {
+   "weight_kg": 0.3,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0031",
+  "name": "Toys item 31",
+  "category": "Toys",
+  "price": 23.39,
+  "in_stock": true,
+  "launched_on": "2022-12-20",
+  "dimensions": {
+   "weight_kg": 9.78,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0032",
+  "name": "Toys item 32",
+  "category": "Toys",
+  "price": 6.88,
+  "in_stock": true,
+  "launched_on": "2024-06-30",
+  "dimensions": {
+   "weight_kg": 4.85,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0033",
+  "name": "Electronics item 33",
+  "category": "Electronics",
+  "price": 21.31,
+  "in_stock": true,
+  "launched_on": "2022-03-27",
+  "dimensions": {
+   "weight_kg": 2.91,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0034",
+  "name": "Home item 34",
+  "category": "Home",
+  "price": 45.67,
+  "in_stock": true,
+  "launched_on": "2024-04-30",
+  "dimensions": {
+   "weight_kg": 10.13,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0035",
+  "name": "Electronics item 35",
+  "category": "Electronics",
+  "price": 11.48,
+  "in_stock": true,
+  "launched_on": "2025-12-10",
+  "dimensions": {
+   "weight_kg": 1.94,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0036",
+  "name": "Books item 36",
+  "category": "Books",
+  "price": 30.63,
+  "in_stock": true,
+  "launched_on": "2022-08-10",
+  "dimensions": {
+   "weight_kg": 10.34,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0037",
+  "name": "Garden item 37",
+  "category": "Garden",
+  "price": 37.48,
+  "in_stock": true,
+  "launched_on": "2024-10-05",
+  "dimensions": {
+   "weight_kg": 4.94,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0038",
+  "name": "Books item 38",
+  "category": "Books",
+  "price": 25.21,
+  "in_stock": true,
+  "launched_on": "2024-03-22",
+  "dimensions": {
+   "weight_kg": 1.62,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0039",
+  "name": "Garden item 39",
+  "category": "Garden",
+  "price": 9.81,
+  "in_stock": true,
+  "launched_on": "2025-10-29",
+  "dimensions": {
+   "weight_kg": 7.82,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0040",
+  "name": "Toys item 40",
+  "category": "Toys",
+  "price": 19.17,
+  "in_stock": true,
+  "launched_on": "2023-04-13",
+  "dimensions": {
+   "weight_kg": 8.78,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0041",
+  "name": "Electronics item 41",
+  "category": "Electronics",
+  "price": 66.41,
+  "in_stock": true,
+  "launched_on": "2024-12-29",
+  "dimensions": {
+   "weight_kg": 11.58,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0042",
+  "name": "Toys item 42",
+  "category": "Toys",
+  "price": 12.24,
+  "in_stock": true,
+  "launched_on": "2025-05-07",
+  "dimensions": {
+   "weight_kg": 8.24,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0043",
+  "name": "Electronics item 43",
+  "category": "Electronics",
+  "price": 34.69,
+  "in_stock": true,
+  "launched_on": "2024-06-27",
+  "dimensions": {
+   "weight_kg": 6.82,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0044",
+  "name": "Toys item 44",
+  "category": "Toys",
+  "price": 29.78,
+  "in_stock": true,
+  "launched_on": "2025-03-05",
+  "dimensions": {
+   "weight_kg": 6.99,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0045",
+  "name": "Books item 45",
+  "category": "Books",
+  "price": 22.84,
+  "in_stock": true,
+  "launched_on": "2022-12-16",
+  "dimensions": {
+   "weight_kg": 4.11,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0046",
+  "name": "Home item 46",
+  "category": "Home",
+  "price": 43.46,
+  "in_stock": true,
+  "launched_on": "2024-08-17",
+  "dimensions": {
+   "weight_kg": 10.29,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0047",
+  "name": "Books item 47",
+  "category": "Books",
+  "price": 14.17,
+  "in_stock": false,
+  "launched_on": "2025-06-16",
+  "dimensions": {
+   "weight_kg": 9.47,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0048",
+  "name": "Electronics item 48",
+  "category": "Electronics",
+  "price": 13.7,
+  "in_stock": true,
+  "launched_on": "2025-10-08",
+  "dimensions": {
+   "weight_kg": 8.89,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0049",
+  "name": "Home item 49",
+  "category": "Home",
+  "price": 18.63,
+  "in_stock": true,
+  "launched_on": "2024-05-25",
+  "dimensions": {
+   "weight_kg": 4.33,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0050",
+  "name": "Electronics item 50",
+  "category": "Electronics",
+  "price": 5.36,
+  "in_stock": true,
+  "launched_on": "2023-02-14",
+  "dimensions": {
+   "weight_kg": 6.28,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0051",
+  "name": "Toys item 51",
+  "category": "Toys",
+  "price": 36.77,
+  "in_stock": true,
+  "launched_on": "2022-09-28",
+  "dimensions": {
+   "weight_kg": 11.81,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0052",
+  "name": "Home item 52",
+  "category": "Home",
+  "price": 14.44,
+  "in_stock": true,
+  "launched_on": "2022-08-05",
+  "dimensions": {
+   "weight_kg": 8.55,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0053",
+  "name": "Home item 53",
+  "category": "Home",
+  "price": 25.67,
+  "in_stock": true,
+  "launched_on": "2022-10-13",
+  "dimensions": {
+   "weight_kg": 5.38,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0054",
+  "name": "Electronics item 54",
+  "category": "Electronics",
+  "price": 12.32,
+  "in_stock": true,
+  "launched_on": "2025-10-02",
+  "dimensions": {
+   "weight_kg": 3.06,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0055",
+  "name": "Books item 55",
+  "category": "Books",
+  "price": 105.67,
+  "in_stock": true,
+  "launched_on": "2023-03-21",
+  "dimensions": {
+   "weight_kg": 1.66,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0056",
+  "name": "Garden item 56",
+  "category": "Garden",
+  "price": 49.23,
+  "in_stock": true,
+  "launched_on": "2024-06-22",
+  "dimensions": {
+   "weight_kg": 11.0,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0057",
+  "name": "Garden item 57",
+  "category": "Garden",
+  "price": 10.79,
+  "in_stock": true,
+  "launched_on": "2023-10-17",
+  "dimensions": {
+   "weight_kg": 8.18,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0058",
+  "name": "Books item 58",
+  "category": "Books",
+  "price": 27.63,
+  "in_stock": true,
+  "launched_on": "2025-08-11",
+  "dimensions": {
+   "weight_kg": 9.72,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0059",
+  "name": "Garden item 59",
+  "category": "Garden",
+  "price": 27.48,
+  "in_stock": false,
+  "launched_on": "2023-05-07",
+  "dimensions": {
+   "weight_kg": 11.54,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0060",
+  "name": "Toys item 60",
+  "category": "Toys",
+  "price": 8.0,
+  "in_stock": false,
+  "launched_on": "2022-04-19",
+  "dimensions": {
+   "weight_kg": 0.56,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0061",
+  "name": "Books item 61",
+  "category": "Books",
+  "price": 4.66,
+  "in_stock": true,
+  "launched_on": "2024-12-19",
+  "dimensions": {
+   "weight_kg": 10.43,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0062",
+  "name": "Toys item 62",
+  "category": "Toys",
+  "price": 44.56,
+  "in_stock": true,
+  "launched_on": "2023-09-25",
+  "dimensions": {
+   "weight_kg": 6.19,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0063",
+  "name": "Toys item 63",
+  "category": "Toys",
+  "price": 19.53,
+  "in_stock": true,
+  "launched_on": "2023-03-11",
+  "dimensions": {
+   "weight_kg": 7.22,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0064",
+  "name": "Home item 64",
+  "category": "Home",
+  "price": 23.91,
+  "in_stock": false,
+  "launched_on": "2025-07-18",
+  "dimensions": {
+   "weight_kg": 1.2,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0065",
+  "name": "Electronics item 65",
+  "category": "Electronics",
+  "price": 23.09,
+  "in_stock": true,
+  "launched_on": "2024-07-08",
+  "dimensions": {
+   "weight_kg": 11.24,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0066",
+  "name": "Electronics item 66",
+  "category": "Electronics",
+  "price": 66.58,
+  "in_stock": true,
+  "launched_on": "2025-03-29",
+  "dimensions": {
+   "weight_kg": 10.25,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0067",
+  "name": "Toys item 67",
+  "category": "Toys",
+  "price": 23.12,
+  "in_stock": true,
+  "launched_on": "2023-06-07",
+  "dimensions": {
+   "weight_kg": 3.16,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0068",
+  "name": "Garden item 68",
+  "category": "Garden",
+  "price": 34.07,
+  "in_stock": true,
+  "launched_on": "2023-10-10",
+  "dimensions": {
+   "weight_kg": 9.44,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0069",
+  "name": "Books item 69",
+  "category": "Books",
+  "price": 26.58,
+  "in_stock": true,
+  "launched_on": "2023-03-09",
+  "dimensions": {
+   "weight_kg": 4.93,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0070",
+  "name": "Toys item 70",
+  "category": "Toys",
+  "price": 30.49,
+  "in_stock": true,
+  "launched_on": "2023-06-17",
+  "dimensions": {
+   "weight_kg": 9.02,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0071",
+  "name": "Garden item 71",
+  "category": "Garden",
+  "price": 26.22,
+  "in_stock": true,
+  "launched_on": "2023-05-10",
+  "dimensions": {
+   "weight_kg": 3.03,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0072",
+  "name": "Home item 72",
+  "category": "Home",
+  "price": 32.31,
+  "in_stock": true,
+  "launched_on": "2022-05-12",
+  "dimensions": {
+   "weight_kg": 0.71,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0073",
+  "name": "Garden item 73",
+  "category": "Garden",
+  "price": 34.03,
+  "in_stock": false,
+  "launched_on": "2023-09-29",
+  "dimensions": {
+   "weight_kg": 11.27,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0074",
+  "name": "Toys item 74",
+  "category": "Toys",
+  "price": 62.56,
+  "in_stock": true,
+  "launched_on": "2025-04-07",
+  "dimensions": {
+   "weight_kg": 10.09,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0075",
+  "name": "Books item 75",
+  "category": "Books",
+  "price": 18.83,
+  "in_stock": true,
+  "launched_on": "2022-01-19",
+  "dimensions": {
+   "weight_kg": 11.08,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0076",
+  "name": "Books item 76",
+  "category": "Books",
+  "price": 14.24,
+  "in_stock": true,
+  "launched_on": "2024-10-05",
+  "dimensions": {
+   "weight_kg": 1.84,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0077",
+  "name": "Electronics item 77",
+  "category": "Electronics",
+  "price": 27.48,
+  "in_stock": true,
+  "launched_on": "2023-12-27",
+  "dimensions": {
+   "weight_kg": 10.36,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0078",
+  "name": "Home item 78",
+  "category": "Home",
+  "price": 64.55,
+  "in_stock": true,
+  "launched_on": "2022-04-21",
+  "dimensions": {
+   "weight_kg": 0.83,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0079",
+  "name": "Toys item 79",
+  "category": "Toys",
+  "price": 35.55,
+  "in_stock": true,
+  "launched_on": "2023-11-24",
+  "dimensions": {
+   "weight_kg": 5.43,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0080",
+  "name": "Books item 80",
+  "category": "Books",
+  "price": 11.42,
+  "in_stock": true,
+  "launched_on": "2024-03-25",
+  "dimensions": {
+   "weight_kg": 3.79,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0081",
+  "name": "Home item 81",
+  "category": "Home",
+  "price": 17.49,
+  "in_stock": true,
+  "launched_on": "2023-07-19",
+  "dimensions": {
+   "weight_kg": 0.99,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0082",
+  "name": "Books item 82",
+  "category": "Books",
+  "price": 20.24,
+  "in_stock": true,
+  "launched_on": "2026-01-07",
+  "dimensions": {
+   "weight_kg": 8.32,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0083",
+  "name": "Toys item 83",
+  "category": "Toys",
+  "price": 45.02,
+  "in_stock": true,
+  "launched_on": "2025-09-01",
+  "dimensions": {
+   "weight_kg": 1.63,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0084",
+  "name": "Home item 84",
+  "category": "Home",
+  "price": 23.38,
+  "in_stock": true,
+  "launched_on": "2023-04-21",
+  "dimensions": {
+   "weight_kg": 1.71,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0085",
+  "name": "Toys item 85",
+  "category": "Toys",
+  "price": 17.02,
+  "in_stock": true,
+  "launched_on": "2025-01-17",
+  "dimensions": {
+   "weight_kg": 2.14,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0086",
+  "name": "Books item 86",
+  "category": "Books",
+  "price": 23.17,
+  "in_stock": false,
+  "launched_on": "2023-11-15",
+  "dimensions": {
+   "weight_kg": 6.96,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0087",
+  "name": "Home item 87",
+  "category": "Home",
+  "price": 45.38,
+  "in_stock": true,
+  "launched_on": "2022-12-10",
+  "dimensions": {
+   "weight_kg": 1.97,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0088",
+  "name": "Home item 88",
+  "category": "Home",
+  "price": 79.24,
+  "in_stock": true,
+  "launched_on": "2024-06-29",
+  "dimensions": {
+   "weight_kg": 9.44,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0089",
+  "name": "Electronics item 89",
+  "category": "Electronics",
+  "price": 28.27,
+  "in_stock": true,
+  "launched_on": "2026-01-30",
+  "dimensions": {
+   "weight_kg": 3.57,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0090",
+  "name": "Toys item 90",
+  "category": "Toys",
+  "price": 19.95,
+  "in_stock": true,
+  "launched_on": "2025-05-19",
+  "dimensions": {
+   "weight_kg": 9.98,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0091",
+  "name": "Home item 91",
+  "category": "Home",
+  "price": 25.19,
+  "in_stock": true,
+  "launched_on": "2023-07-29",
+  "dimensions": {
+   "weight_kg": 2.31,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0092",
+  "name": "Home item 92",
+  "category": "Home",
+  "price": 37.39,
+  "in_stock": true,
+  "launched_on": "2022-06-26",
+  "dimensions": {
+   "weight_kg": 8.1,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0093",
+  "name": "Garden item 93",
+  "category": "Garden",
+  "price": 35.73,
+  "in_stock": true,
+  "launched_on": "2022-09-10",
+  "dimensions": {
+   "weight_kg": 5.45,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0094",
+  "name": "Books item 94",
+  "category": "Books",
+  "price": 38.81,
+  "in_stock": true,
+  "launched_on": "2023-10-16",
+  "dimensions": {
+   "weight_kg": 9.49,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0095",
+  "name": "Garden item 95",
+  "category": "Garden",
+  "price": 17.66,
+  "in_stock": true,
+  "launched_on": "2022-11-08",
+  "dimensions": {
+   "weight_kg": 1.72,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0096",
+  "name": "Garden item 96",
+  "category": "Garden",
+  "price": 68.55,
+  "in_stock": true,
+  "launched_on": "2024-10-30",
+  "dimensions": {
+   "weight_kg": 6.34,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0097",
+  "name": "Books item 97",
+  "category": "Books",
+  "price": 26.18,
+  "in_stock": true,
+  "launched_on": "2025-09-23",
+  "dimensions": {
+   "weight_kg": 1.49,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0098",
+  "name": "Garden item 98",
+  "category": "Garden",
+  "price": 25.06,
+  "in_stock": true,
+  "launched_on": "2024-03-27",
+  "dimensions": {
+   "weight_kg": 9.13,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0099",
+  "name": "Toys item 99",
+  "category": "Toys",
+  "price": 31.57,
+  "in_stock": true,
+  "launched_on": "2023-05-03",
+  "dimensions": {
+   "weight_kg": 0.21,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0100",
+  "name": "Garden item 100",
+  "category": "Garden",
+  "price": 6.85,
+  "in_stock": true,
+  "launched_on": "2022-10-12",
+  "dimensions": {
+   "weight_kg": 8.55,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0101",
+  "name": "Books item 101",
+  "category": "Books",
+  "price": 19.64,
+  "in_stock": true,
+  "launched_on": "2023-10-25",
+  "dimensions": {
+   "weight_kg": 7.28,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0102",
+  "name": "Books item 102",
+  "category": "Books",
+  "price": 21.86,
+  "in_stock": false,
+  "launched_on": "2022-09-16",
+  "dimensions": {
+   "weight_kg": 5.92,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0103",
+  "name": "Garden item 103",
+  "category": "Garden",
+  "price": 22.11,
+  "in_stock": true,
+  "launched_on": "2023-10-21",
+  "dimensions": {
+   "weight_kg": 9.26,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0104",
+  "name": "Garden item 104",
+  "category": "Garden",
+  "price": 34.16,
+  "in_stock": true,
+  "launched_on": "2024-08-01",
+  "dimensions": {
+   "weight_kg": 3.73,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0105",
+  "name": "Electronics item 105",
+  "category": "Electronics",
+  "price": 10.85,
+  "in_stock": true,
+  "launched_on": "2023-03-10",
+  "dimensions": {
+   "weight_kg": 11.58,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0106",
+  "name": "Toys item 106",
+  "category": "Toys",
+  "price": 59.16,
+  "in_stock": true,
+  "launched_on": "2022-08-25",
+  "dimensions": {
+   "weight_kg": 10.16,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0107",
+  "name": "Garden item 107",
+  "category": "Garden",
+  "price": 32.77,
+  "in_stock": true,
+  "launched_on": "2023-12-13",
+  "dimensions": {
+   "weight_kg": 2.49,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0108",
+  "name": "Garden item 108",
+  "category": "Garden",
+  "price": 46.58,
+  "in_stock": true,
+  "launched_on": "2024-03-16",
+  "dimensions": {
+   "weight_kg": 2.38,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0109",
+  "name": "Books item 109",
+  "category": "Books",
+  "price": 56.72,
+  "in_stock": true,
+  "launched_on": "2024-06-07",
+  "dimensions": {
+   "weight_kg": 10.19,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0110",
+  "name": "Electronics item 110",
+  "category": "Electronics",
+  "price": 27.44,
+  "in_stock": true,
+  "launched_on": "2023-09-26",
+  "dimensions": {
+   "weight_kg": 10.95,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0111",
+  "name": "Books item 111",
+  "category": "Books",
+  "price": 21.84,
+  "in_stock": true,
+  "launched_on": "2022-01-19",
+  "dimensions": {
+   "weight_kg": 1.85,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0112",
+  "name": "Garden item 112",
+  "category": "Garden",
+  "price": 48.4,
+  "in_stock": true,
+  "launched_on": "2022-04-05",
+  "dimensions": {
+   "weight_kg": 4.36,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0113",
+  "name": "Garden item 113",
+  "category": "Garden",
+  "price": 63.1,
+  "in_stock": false,
+  "launched_on": "2022-01-21",
+  "dimensions": {
+   "weight_kg": 2.2,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0114",
+  "name": "Garden item 114",
+  "category": "Garden",
+  "price": 32.34,
+  "in_stock": true,
+  "launched_on": "2023-01-25",
+  "dimensions": {
+   "weight_kg": 4.9,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0115",
+  "name": "Garden item 115",
+  "category": "Garden",
+  "price": 28.04,
+  "in_stock": true,
+  "launched_on": "2023-10-02",
+  "dimensions": {
+   "weight_kg": 4.19,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0116",
+  "name": "Home item 116",
+  "category": "Home",
+  "price": 17.41,
+  "in_stock": true,
+  "launched_on": "2024-10-15",
+  "dimensions": {
+   "weight_kg": 7.41,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0117",
+  "name": "Home item 117",
+  "category": "Home",
+  "price": 17.14,
+  "in_stock": false,
+  "launched_on": "2022-06-23",
+  "dimensions": {
+   "weight_kg": 9.12,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0118",
+  "name": "Electronics item 118",
+  "category": "Electronics",
+  "price": 70.46,
+  "in_stock": true,
+  "launched_on": "2025-09-24",
+  "dimensions": {
+   "weight_kg": 7.19,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0119",
+  "name": "Home item 119",
+  "category": "Home",
+  "price": 34.81,
+  "in_stock": true,
+  "launched_on": "2024-03-08",
+  "dimensions": {
+   "weight_kg": 2.11,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0120",
+  "name": "Home item 120",
+  "category": "Home",
+  "price": 30.12,
+  "in_stock": false,
+  "launched_on": "2023-12-27",
+  "dimensions": {
+   "weight_kg": 2.81,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0121",
+  "name": "Electronics item 121",
+  "category": "Electronics",
+  "price": 33.1,
+  "in_stock": true,
+  "launched_on": "2025-08-12",
+  "dimensions": {
+   "weight_kg": 7.25,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0122",
+  "name": "Books item 122",
+  "category": "Books",
+  "price": 33.79,
+  "in_stock": true,
+  "launched_on": "2024-09-30",
+  "dimensions": {
+   "weight_kg": 10.03,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0123",
+  "name": "Electronics item 123",
+  "category": "Electronics",
+  "price": 18.54,
+  "in_stock": true,
+  "launched_on": "2026-01-16",
+  "dimensions": {
+   "weight_kg": 8.24,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0124",
+  "name": "Garden item 124",
+  "category": "Garden",
+  "price": 34.82,
+  "in_stock": false,
+  "launched_on": "2025-04-09",
+  "dimensions": {
+   "weight_kg": 9.74,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0125",
+  "name": "Books item 125",
+  "category": "Books",
+  "price": 37.05,
+  "in_stock": true,
+  "launched_on": "2023-02-28",
+  "dimensions": {
+   "weight_kg": 11.29,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0126",
+  "name": "Books item 126",
+  "category": "Books",
+  "price": 14.82,
+  "in_stock": true,
+  "launched_on": "2025-05-14",
+  "dimensions": {
+   "weight_kg": 0.6,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0127",
+  "name": "Garden item 127",
+  "category": "Garden",
+  "price": 26.11,
+  "in_stock": false,
+  "launched_on": "2025-09-23",
+  "dimensions": {
+   "weight_kg": 8.03,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0128",
+  "name": "Garden item 128",
+  "category": "Garden",
+  "price": 18.72,
+  "in_stock": true,
+  "launched_on": "2022-11-05",
+  "dimensions": {
+   "weight_kg": 1.52,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0129",
+  "name": "Books item 129",
+  "category": "Books",
+  "price": 14.12,
+  "in_stock": true,
+  "launched_on": "2023-08-25",
+  "dimensions": {
+   "weight_kg": 8.95,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0130",
+  "name": "Toys item 130",
+  "category": "Toys",
+  "price": 48.87,
+  "in_stock": false,
+  "launched_on": "2022-09-27",
+  "dimensions": {
+   "weight_kg": 8.28,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0131",
+  "name": "Electronics item 131",
+  "category": "Electronics",
+  "price": 65.73,
+  "in_stock": true,
+  "launched_on": "2022-10-13",
+  "dimensions": {
+   "weight_kg": 9.41,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0132",
+  "name": "Home item 132",
+  "category": "Home",
+  "price": 21.71,
+  "in_stock": true,
+  "launched_on": "2025-08-27",
+  "dimensions": {
+   "weight_kg": 4.05,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0133",
+  "name": "Electronics item 133",
+  "category": "Electronics",
+  "price": 23.63,
+  "in_stock": true,
+  "launched_on": "2024-12-08",
+  "dimensions": {
+   "weight_kg": 1.66,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0134",
+  "name": "Electronics item 134",
+  "category": "Electronics",
+  "price": 12.15,
+  "in_stock": true,
+  "launched_on": "2022-09-10",
+  "dimensions": {
+   "weight_kg": 3.76,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0135",
+  "name": "Books item 135",
+  "category": "Books",
+  "price": 17.92,
+  "in_stock": true,
+  "launched_on": "2023-07-25",
+  "dimensions": {
+   "weight_kg": 9.08,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0136",
+  "name": "Electronics item 136",
+  "category": "Electronics",
+  "price": 15.49,
+  "in_stock": true,
+  "launched_on": "2022-07-02",
+  "dimensions": {
+   "weight_kg": 10.05,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0137",
+  "name": "Books item 137",
+  "category": "Books",
+  "price": 36.64,
+  "in_stock": true,
+  "launched_on": "2025-11-27",
+  "dimensions": {
+   "weight_kg": 9.48,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0138",
+  "name": "Garden item 138",
+  "category": "Garden",
+  "price": 45.94,
+  "in_stock": true,
+  "launched_on": "2023-03-03",
+  "dimensions": {
+   "weight_kg": 5.38,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0139",
+  "name": "Home item 139",
+  "category": "Home",
+  "price": 22.28,
+  "in_stock": true,
+  "launched_on": "2024-01-03",
+  "dimensions": {
+   "weight_kg": 3.02,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0140",
+  "name": "Toys item 140",
+  "category": "Toys",
+  "price": 32.95,
+  "in_stock": true,
+  "launched_on": "2025-04-22",
+  "dimensions": {
+   "weight_kg": 10.04,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0141",
+  "name": "Home item 141",
+  "category": "Home",
+  "price": 37.12,
+  "in_stock": true,
+  "launched_on": "2025-03-09",
+  "dimensions": {
+   "weight_kg": 11.06,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0142",
+  "name": "Toys item 142",
+  "category": "Toys",
+  "price": 15.87,
+  "in_stock": true,
+  "launched_on": "2025-08-23",
+  "dimensions": {
+   "weight_kg": 7.18,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0143",
+  "name": "Books item 143",
+  "category": "Books",
+  "price": 24.02,
+  "in_stock": true,
+  "launched_on": "2023-10-09",
+  "dimensions": {
+   "weight_kg": 10.76,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0144",
+  "name": "Garden item 144",
+  "category": "Garden",
+  "price": 14.51,
+  "in_stock": true,
+  "launched_on": "2023-01-17",
+  "dimensions": {
+   "weight_kg": 1.66,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0145",
+  "name": "Books item 145",
+  "category": "Books",
+  "price": 13.41,
+  "in_stock": true,
+  "launched_on": "2023-11-11",
+  "dimensions": {
+   "weight_kg": 10.25,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0146",
+  "name": "Books item 146",
+  "category": "Books",
+  "price": 31.09,
+  "in_stock": true,
+  "launched_on": "2025-12-15",
+  "dimensions": {
+   "weight_kg": 5.54,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0147",
+  "name": "Home item 147",
+  "category": "Home",
+  "price": 35.42,
+  "in_stock": true,
+  "launched_on": "2026-02-03",
+  "dimensions": {
+   "weight_kg": 6.48,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0148",
+  "name": "Home item 148",
+  "category": "Home",
+  "price": 31.69,
+  "in_stock": true,
+  "launched_on": "2024-03-08",
+  "dimensions": {
+   "weight_kg": 1.47,
+   "fragile": true
+  }
+ },
+ {
+  "product_id": "P-0149",
+  "name": "Electronics item 149",
+  "category": "Electronics",
+  "price": 79.17,
+  "in_stock": true,
+  "launched_on": "2024-11-25",
+  "dimensions": {
+   "weight_kg": 9.96,
+   "fragile": false
+  }
+ },
+ {
+  "product_id": "P-0150",
+  "name": "Toys item 150",
+  "category": "Toys",
+  "price": 35.14,
+  "in_stock": true,
+  "launched_on": "2022-06-03",
+  "dimensions": {
+   "weight_kg": 7.05,
+   "fragile": false
+  }
+ }
+]

@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datasentinel import __version__
 from datasentinel.api import health
 from datasentinel.config import Settings, get_settings
+from datasentinel.db import build_engine, make_session_factory, run_migrations
 from datasentinel.errors import install_error_handlers
 from datasentinel.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
 
@@ -22,10 +23,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     logging.basicConfig(level=settings.log_level.upper(),
                         format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
+    engine = build_engine(settings)
+
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         settings.data_dir.mkdir(parents=True, exist_ok=True)
+        settings.storage_dir.mkdir(parents=True, exist_ok=True)
+        if settings.auto_migrate:
+            run_migrations(engine)
         yield
+        engine.dispose()
 
     app = FastAPI(
         title="DataSentinel API",
@@ -38,6 +45,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url=f"{API_PREFIX}/openapi.json",
     )
     app.state.settings = settings
+    app.state.engine = engine
+    app.state.session_factory = make_session_factory(engine)
 
     install_error_handlers(app)
     # Upload bodies may carry multipart overhead on top of the file itself.
