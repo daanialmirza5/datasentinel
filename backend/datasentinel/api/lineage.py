@@ -13,6 +13,7 @@ from datasentinel.lineage.graph import downstream, upstream, would_create_cycle
 from datasentinel.models import Dataset, LineageAsset, LineageEdge
 from datasentinel.services import lineage as svc
 from datasentinel.services.datasets import list_versions
+from datasentinel.services.impact import impact_analysis, impact_summary
 
 router = APIRouter(prefix="/lineage", tags=["lineage"])
 
@@ -145,6 +146,18 @@ def delete_edge(edge_id: str, session: Session = Depends(get_db)) -> dict[str, A
         raise NotFoundError(f"Edge '{edge_id}' not found")
     session.delete(edge)
     return {"deleted": True, "edge_id": edge_id}
+
+
+@router.get("/impact/summary")
+def impact_overview(session: Session = Depends(get_db)) -> dict[str, Any]:
+    """Assets potentially affected by any currently failing or anomalous dataset."""
+    return impact_summary(session)
+
+
+@router.get("/{asset_id}/impact")
+def asset_impact(asset_id: str, session: Session = Depends(get_db)) -> dict[str, Any]:
+    """Direct and transitive downstream impact of an asset, with evidence, classification and recommendations."""
+    return impact_analysis(session, _asset(session, asset_id))
 
 
 @router.get("/{asset_id}")
