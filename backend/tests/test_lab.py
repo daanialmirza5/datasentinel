@@ -196,3 +196,24 @@ def test_dataset_scope_and_healthy_evaluation():
     assert result["detected"] and result["counts"]["false_positive_signals"] == 0
     assert evaluate_healthy([_signal("null_rate_decrease", "a", "info")])["alarm"] is False
     assert evaluate_healthy([_signal("distribution_shift", "a", "low")])["false_positive_signals"] == 1
+
+
+def test_multi_column_rule_signal_is_attributed_to_both_columns():
+    truth = {
+        "scope": "column",
+        "affected_columns": ["order_ts"],
+        "expected": {"primary": ["timestamp_invalid"], "accepted": ["relationship_violation"]},
+    }
+    signal = {**_signal("relationship_violation", "shipped_ts"), "evidence": {"columns": ["shipped_ts", "order_ts"]}}
+    result = evaluate(truth, [signal, _signal("timestamp_invalid", "order_ts")])
+    assert result["counts"]["false_positive_signals"] == 0
+
+
+def test_outlier_injection_only_counts_rows_that_change(client):
+    from tests.helpers import import_ok
+
+    rows = "".join(f"{i},{0 if i % 2 else i}\n" for i in range(200))
+    ds = import_ok(client, ("id,discount\n" + rows).encode(), dataset_name="zeros")["dataset"]
+    exp = run_fault(client, ds["id"], "numeric_outliers", column="discount", fraction=0.2, factor=10)
+    assert all(e["before"]["discount"] != "0" for e in exp["ground_truth"]["examples"])
+    assert all(e["before"] != e["after"] for e in exp["ground_truth"]["examples"])

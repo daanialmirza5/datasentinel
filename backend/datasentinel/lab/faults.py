@@ -231,7 +231,9 @@ def inject_outliers(ctx: FaultContext, p: OutlierParams):
     column = p.column = _pick_column(ctx, p, "numeric")
     out = ctx.table.raw.copy()
     typed = ctx.table.typed[column].astype("float64")
-    rows = _choose_rows(ctx, np.flatnonzero(typed.notna().to_numpy()), p.fraction, minimum=3)
+    # Zero times any factor is still zero: only rows whose value actually changes count as injected.
+    changeable = (typed.notna() & (typed != 0)).to_numpy()
+    rows = _choose_rows(ctx, np.flatnonzero(changeable), p.fraction, minimum=3)
     integer = ctx.table.inference(column).inferred_type == "integer"
     col = out.columns.get_loc(column)
     for r in rows:

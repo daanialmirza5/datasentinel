@@ -20,8 +20,17 @@ from datasentinel.services.datasets import LoadedTable
 from datasentinel.services.validation import evaluate_rules
 
 
+def _rule_columns(result: dict[str, Any], params: dict[str, Any]) -> list[str]:
+    columns = [result["column_name"]] if result["column_name"] else []
+    if params.get("other_column"):
+        columns.append(params["other_column"])
+    columns.extend(params.get("extra_columns", []))
+    return columns
+
+
 def rule_signals(base_results: list[dict[str, Any]], cand_results: list[dict[str, Any]]) -> list[Signal]:
     before = {r["rule_id"]: r["status"] for r in base_results}
+    params_by_rule = {r["rule_id"]: r.get("params", {}) for r in cand_results}
     signals = []
     for result in cand_results:
         if result["status"] != "failed" or before.get(result["rule_id"]) == "failed":
@@ -43,6 +52,8 @@ def rule_signals(base_results: list[dict[str, Any]], cand_results: list[dict[str
                 {
                     "rule_id": result["rule_id"],
                     "rule_type": result["rule_type"],
+                    # Every column the rule inspects, so evaluation can attribute multi-column rules.
+                    "columns": _rule_columns(result, params_by_rule.get(result["rule_id"], {})),
                     "violation_count": result["violation_count"],
                     "violation_pct": result["violation_pct"],
                     "examples": result["examples"][:3],

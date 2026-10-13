@@ -59,6 +59,7 @@ def evaluate_rules(
                 "message": outcome.message,
                 "examples": outcome.examples,
                 "details": outcome.details,
+                "params": dict(rule.params or {}),
                 "recommendation": recommendation_for(spec) if outcome.status in ("failed", "error") else "",
             }
         )
@@ -107,7 +108,7 @@ def run_validation(
     session.flush()
     results = evaluate_rules(load_table(settings, version), rules, settings, reference_resolver(session, settings))
     for result in results:
-        session.add(RuleResult(run_id=run.id, **result))
+        session.add(RuleResult(run_id=run.id, **{k: v for k, v in result.items() if k != "params"}))
     run.summary = summarize(results)
     run.finished_at = utcnow()
     session.flush()

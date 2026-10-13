@@ -11,9 +11,11 @@ practically meaningful change. Assumptions and safeguards per detector:
   integers) the test is conservative, i.e. it under- rather than over-reports. PSI over the
   baseline's deciles is reported as an effect size.
 * **Numeric outliers** — counts values outside the *baseline's* far-out Tukey fences
-  (Q1 − 3·IQR, Q3 + 3·IQR) and tests the excess with a one-sided binomial test against the
-  baseline's own far-out rate. Comparing against the baseline avoids flagging heavy tails that
-  were always there.
+  (Q1 − 3·IQR, Q3 + 3·IQR) and compares the far-out *rates* of the two versions with the same
+  two-proportion / Fisher test as above (the baseline rate is an estimate, not a known constant). Comparing against the baseline avoids flagging heavy tails that
+  were always there. Strictly positive, right-skewed columns (skewness > 1) are fenced on the log
+  scale. For zero-inflated columns (at least half the baseline values are exactly 0)
+  fences and rates are computed on the non-zero values only.
 * **Categories** — new values not seen in the baseline (count and share floors), baseline
   categories that disappeared, and a chi-square test of homogeneity over *baseline* categories
   (cells with expected count < 5 pooled) with PSI as effect size.
@@ -29,6 +31,7 @@ from __future__ import annotations
 
 import math
 import re
+import warnings
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -239,7 +242,10 @@ def compare_numeric(
         return
     out["chart"] = _shared_histogram(b, c, cfg.histogram_bins)
 
-    ks = stats.ks_2samp(b, c)
+    with warnings.catch_warnings():
+        # scipy falls back from the exact to the asymptotic p-value for large or tied samples.
+        warnings.simplefilter("ignore", RuntimeWarning)
+        ks = stats.ks_2samp(b, c)
     psi_value = numeric_psi(b, c)
     std = float(b.std(ddof=1)) if b.size > 1 else 0.0
     mean_shift = (float(c.mean()) - float(b.mean())) / std if std > 0 else None
@@ -264,23 +270,47 @@ def compare_numeric(
             )
         )
 
-    q1, q3 = np.percentile(b, [25, 75])
+    # Zero-inflated columns (e.g. discounts that are usually 0): fences computed over all values sit
+    # inside the ordinary non-zero tail, so the non-zero part is modelled separately (hurdle style).
+    zero_inflated = bool((b == 0).mean() >= 0.5 and (b != 0).sum() >= cfg.min_sample)
+    ref = b[b != 0] if zero_inflated else b
+    # Strictly positive, right-skewed measures (prices, amounts) are compared on the log scale, the
+    # same rule the within-version detector uses: linear-scale fences sit inside their natural tail,
+    # so the count beyond them is large and unstable, while scaling errors stand out clearly in logs.
+    log_scale = bool(ref.min() > 0 and ref.size > 2 and float(pd.Series(ref).skew()) > 1.0)
+    if log_scale:
+        ref = np.log(ref)
+    q1, q3 = np.percentile(ref, [25, 75])
     iqr = q3 - q1
-    lo, hi = (q1 - cfg.outlier_iqr_k * iqr, q3 + cfg.outlier_iqr_k * iqr) if iqr > 0 else (b.min(), b.max())
-    base_out = int(((b < lo) | (b > hi)).sum())
-    rate = max(base_out / b.size, 0.5 / b.size)
+    lo, hi = (q1 - cfg.outlier_iqr_k * iqr, q3 + cfg.outlier_iqr_k * iqr) if iqr > 0 else (ref.min(), ref.max())
+    base_out = int(((ref < lo) | (ref > hi)).sum())
+    rate = max(base_out / ref.size, 0.5 / ref.size)
     cand_numbers = (
         pd.to_numeric(cand.typed[column], errors="coerce").to_numpy(dtype=float)
         if not pd.api.types.is_bool_dtype(cand.typed[column])
         else np.full(len(cand.raw), np.nan)
     )
-    mask = (cand_numbers < lo) | (cand_numbers > hi)
+    considered = ~np.isnan(cand_numbers) & ((cand_numbers != 0) if zero_inflated else True)
+    n_considered = int(considered.sum())
+    if log_scale:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            # Non-positive values lie outside a strictly positive baseline's support: always far out.
+            scaled = np.where(cand_numbers > 0, np.log(np.where(cand_numbers > 0, cand_numbers, 1.0)), -np.inf)
+    else:
+        scaled = cand_numbers
+    mask = considered & ((scaled < lo) | (scaled > hi))
     cand_out = int(mask.sum())
-    expected = rate * c.size
-    p_value = float(stats.binom.sf(cand_out - 1, c.size, rate)) if cand_out else 1.0
-    distance = np.nan_to_num(np.maximum(lo - cand_numbers, cand_numbers - hi), nan=-np.inf)
+    expected = rate * n_considered
+    # The baseline rate is itself an estimate (few tail points), so compare the two samples' rates
+    # rather than testing against the baseline rate as if it were known.
+    increased = n_considered > 0 and cand_out / n_considered > base_out / ref.size
+    p_value = proportion_test(base_out, int(ref.size), cand_out, n_considered)[0] if increased else 1.0
+    distance = np.nan_to_num(np.maximum(lo - scaled, scaled - hi), nan=-np.inf, posinf=np.inf, neginf=-np.inf)
+    fences = (float(np.exp(lo)), float(np.exp(hi))) if log_scale else (float(lo), float(hi))
     out["outliers"] = {
-        "fences": [clean(lo), clean(hi)],
+        "zero_inflated": zero_inflated,
+        "log_scale": log_scale,
+        "fences": [clean(fences[0]), clean(fences[1])],
         "base_count": base_out,
         "candidate_count": cand_out,
         "expected": round(expected, 3),
@@ -295,7 +325,7 @@ def compare_numeric(
                 "high" if pct >= 1 else "medium",
                 f"{cand_out} extreme '{column}' values (expected ≈{expected:.1f})",
                 f"{cand_out} values of '{column}' ({pct:.2f}%) fall outside the previous version's far-out fences "
-                f"[{lo:.4g}, {hi:.4g}] versus ≈{expected:.1f} expected from the baseline rate (binomial p={p_value:.2g}). "
+                f"[{fences[0]:.4g}, {fences[1]:.4g}]{' (log-scale fences)' if log_scale else ''} versus ≈{expected:.1f} expected from the baseline rate (two-sample test p={p_value:.2g}). "
                 "Typical causes: unit or scaling errors, sentinel values, corrupted parsing.",
                 column,
                 evidence=out["outliers"],
@@ -441,7 +471,7 @@ def compare_timestamps(
     x1 = base_profile.get("future_count", 0) + base_profile.get("pre_1971_count", 0)
     x2 = cand_profile.get("future_count", 0) + cand_profile.get("pre_1971_count", 0)
     rate = max(x1 / n1, 0.5 / n1)
-    p_value = float(stats.binom.sf(x2 - 1, n2, rate)) if x2 else 1.0
+    p_value = proportion_test(x1, n1, x2, n2)[0] if x2 / n2 > x1 / n1 else 1.0
     out["window"] = {
         "base": [base_profile.get("min"), base_profile.get("max")],
         "candidate": [cand_profile.get("min"), cand_profile.get("max")],

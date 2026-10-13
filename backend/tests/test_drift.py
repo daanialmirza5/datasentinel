@@ -193,3 +193,23 @@ def test_drift_between_explicit_versions_and_errors(client):
     assert body.status_code == 200 and body.json()["base"]["id"] == v2
     same = client.get(f"/api/v1/datasets/{ds_id}/drift", params={"base_version_id": v1, "candidate_version_id": v1})
     assert same.status_code == 422
+
+
+def test_outliers_in_zero_inflated_columns_use_nonzero_fences():
+    rng = np.random.default_rng(9)
+
+    def discounts(seed_rng):
+        values = np.round(seed_rng.uniform(1, 20, 2000), 2)
+        values[seed_rng.random(2000) < 0.7] = 0.0
+        return values
+
+    base = pd.DataFrame({"discount": discounts(rng)})
+    healthy = pd.DataFrame({"discount": discounts(rng)})
+    assert ("numeric_outlier", "discount") not in keys(drift(base, healthy))
+    faulty = pd.DataFrame({"discount": discounts(rng)})
+    nonzero = faulty.index[faulty["discount"] > 0][:40]
+    faulty.loc[nonzero, "discount"] *= 50
+    result = drift(base, faulty)
+    assert ("numeric_outlier", "discount") in keys(result)
+    signal = next(s for s in result["signals"] if s["category"] == "numeric_outlier")
+    assert signal["evidence"]["zero_inflated"] is True

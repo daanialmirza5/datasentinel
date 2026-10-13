@@ -14,7 +14,7 @@ from datasentinel.detection.signals import SEVERITY_RANK, Signal, severity_count
 from datasentinel.detection.statistics import DetectionConfig, compare_columns, compare_dataset
 from datasentinel.services.datasets import LoadedTable
 
-DRIFT_ALGORITHM_VERSION = "1.1"
+DRIFT_ALGORITHM_VERSION = "1.4"
 DEFAULT_CONFIG = DetectionConfig()
 
 

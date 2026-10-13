@@ -8,7 +8,8 @@ expected (primary) or accepted (consequential) categories *and* it points at an 
 or, for dataset-scoped faults (duplicates, row removal), when it is dataset-level or a
 ``uniqueness_lost`` signal. Relevant signals are true positives; every other actionable signal is a
 false positive. An expected (primary) signal is *missed* when no true positive of that category was
-raised for the affected column(s). The scenario counts as *detected* when at least one true
+raised for the affected column(s). Rule signals list every column the rule inspects (for example both
+sides of a column comparison), and are relevant when any of them was affected. The scenario counts as *detected* when at least one true
 positive of a primary category exists.
 """
 
@@ -31,7 +32,8 @@ def is_relevant(signal: dict[str, Any], truth: dict[str, Any]) -> bool:
         return False
     if truth["scope"] == "dataset":
         return signal.get("column") is None or signal["category"] in DATASET_SCOPE_COLUMN_CATEGORIES
-    return signal.get("column") in set(truth["affected_columns"])
+    columns = signal.get("evidence", {}).get("columns") or [signal.get("column")]
+    return bool(set(columns) & set(truth["affected_columns"]))
 
 
 def evaluate(truth: dict[str, Any], signals: list[dict[str, Any]]) -> dict[str, Any]:
