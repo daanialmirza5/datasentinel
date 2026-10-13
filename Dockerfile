@@ -8,7 +8,7 @@ RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.12-slim AS runtime
+FROM python:3.14-slim AS runtime
 # Optional extras: "ml" (scikit-learn Isolation Forest) and/or "postgres" (psycopg driver).
 ARG EXTRAS="ml"
 ENV PYTHONDONTWRITEBYTECODE=1 \
