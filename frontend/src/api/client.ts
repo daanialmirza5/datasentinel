@@ -93,6 +93,8 @@ export const api = {
   dashboard: () => request<Dashboard>('GET', '/dashboard'),
   settings: () => request<SettingsInfo>('GET', '/settings'),
   loadSamples: () => request<{ datasets: number; versions: number; rules: number }>('POST', '/samples/load'),
+  runIntegrity: () =>
+    request<{ ok: boolean; database: { ok: boolean }; files: { checked: number; missing: unknown[]; corrupted: unknown[]; orphaned: string[] } }>('POST', '/maintenance/integrity'),
   runRetention: () => request<{ expired_experiments_removed: number }>('POST', '/maintenance/retention'),
 
   datasets: (query?: Query) => request<Page<Dataset>>('GET', '/datasets', { query }),

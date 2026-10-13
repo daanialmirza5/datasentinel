@@ -506,6 +506,7 @@ export interface Dashboard {
 export interface SettingsInfo {
   version: string;
   environment: string;
+  demo_mode: boolean;
   database_backend: string;
   storage: { usage_bytes: number; location: string };
   limits: Record<string, number>;

@@ -13,6 +13,7 @@ from datasentinel import __version__
 from datasentinel.api import datasets, drift, experiments, health, lineage, reports, rules, system
 from datasentinel.config import Settings, get_settings
 from datasentinel.db import build_engine, make_session_factory, run_migrations, session_scope
+from datasentinel.demo_mode import DemoModeMiddleware
 from datasentinel.errors import install_error_handlers
 from datasentinel.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
 from datasentinel.models import Dataset
@@ -75,6 +76,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_credentials=False,
         expose_headers=["X-Request-Id", "Content-Disposition"],
     )
+    if settings.demo_mode:
+        app.add_middleware(DemoModeMiddleware)
     app.add_middleware(RequestContextMiddleware)
 
     app.include_router(health.router, prefix=API_PREFIX)

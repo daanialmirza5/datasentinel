@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     # Startup behaviour
     auto_migrate: bool = True
     load_samples_on_startup: bool = False
+    # Public read-only demo: refuse uploads and edits, keep the fault lab and reports usable.
+    demo_mode: bool = False
 
     @field_validator("cors_origins", mode="before")
     @classmethod

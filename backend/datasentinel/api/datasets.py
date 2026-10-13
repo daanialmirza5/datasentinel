@@ -83,7 +83,7 @@ def import_dataset(
         content=content,
         filename=file.filename,
         dataset_id=dataset_id or None,
-        dataset_name=dataset_name or None,
+        dataset_name=(dataset_name or "").strip() or None,
         description=description,
         file_format=file_format,
     )

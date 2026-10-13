@@ -88,6 +88,11 @@ export function SettingsPage() {
             <Button busy={busy === 'samples'} onClick={() => act('samples', async () => { const r = await api.loadSamples(); return `Loaded ${r.datasets} datasets, ${r.versions} versions and ${r.rules} rules.`; })}>
               Load demo workspace
             </Button>
+            <Button busy={busy === 'integrity'} onClick={() => act('integrity', async () => { const r = await api.runIntegrity(); return r.ok
+                    ? `Integrity OK: database consistent, ${r.files.checked} stored file(s) match their SHA-256.`
+                    : `Integrity problems: ${r.files.missing.length} missing, ${r.files.corrupted.length} corrupted file(s); database consistent: ${r.database.ok}.`; })}>
+              Verify integrity
+            </Button>
             <Button busy={busy === 'retention'} onClick={() => act('retention', async () => { const r = await api.runRetention(); return `Removed ${r.expired_experiments_removed} expired experiment(s).`; })}>
               Apply retention now
             </Button>

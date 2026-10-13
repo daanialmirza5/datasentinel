@@ -21,6 +21,7 @@ from datasentinel.services.datasets import current_version, storage_for
 from datasentinel.services.drift import latest_drift
 from datasentinel.services.experiments import purge_expired
 from datasentinel.services.impact import impact_summary
+from datasentinel.services.integrity import check_integrity
 from datasentinel.services.validation import latest_run
 
 router = APIRouter(tags=["system"])
@@ -131,6 +132,7 @@ def settings_view(settings: Settings = Depends(get_settings_dep)) -> dict[str, A
     return {
         "version": __version__,
         "environment": settings.environment,
+        "demo_mode": settings.demo_mode,
         "database_backend": settings.database_backend,
         "storage": {
             "usage_bytes": storage_for(settings).usage_bytes(),
@@ -175,6 +177,12 @@ def samples() -> dict[str, Any]:
 def load_samples(session: Session = Depends(get_db), settings: Settings = Depends(get_settings_dep)) -> dict[str, Any]:
     """Import the bundled demo datasets, their quality rules and the demo lineage graph."""
     return load_demo_workspace(session, settings)
+
+
+@router.post("/maintenance/integrity")
+def run_integrity(session: Session = Depends(get_db), settings: Settings = Depends(get_settings_dep)) -> dict[str, Any]:
+    """Verify database consistency and every stored file against its recorded SHA-256 (read-only)."""
+    return check_integrity(session, settings)
 
 
 @router.post("/maintenance/retention")

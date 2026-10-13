@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { api } from '../api/client';
+import { useAsync } from '../hooks/useAsync';
 import { cx } from '../lib/format';
 
 const NAV = [
@@ -38,6 +40,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const [lastPath, setLastPath] = useState(location.pathname);
+  const settings = useAsync(() => api.settings(), []);
   if (lastPath !== location.pathname) {
     setLastPath(location.pathname);
     setOpen(false);
@@ -78,7 +81,14 @@ export function Layout({ children }: { children: ReactNode }) {
         </nav>
       </aside>
       <main id="main" className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">{children}</div>
+        <div className="mx-auto max-w-7xl">
+          {settings.data?.demo_mode && (
+            <p role="note" className="mb-4 rounded-lg border border-accent/30 bg-accent/5 px-4 py-2 text-sm text-accent-strong">
+              Read-only public demo with synthetic data: uploads and edits are disabled; the fault lab and reports work. Run DataSentinel locally to use your own data.
+            </p>
+          )}
+          {children}
+        </div>
       </main>
     </div>
   );
