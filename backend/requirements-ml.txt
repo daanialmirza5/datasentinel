@@ -1,4 +1,4 @@
 # Optional: enables the Isolation Forest detector (multivariate, unsupervised).
 scikit-learn==1.7.2
-joblib==1.5.2
+joblib==1.6.0
 threadpoolctl==3.6.0
