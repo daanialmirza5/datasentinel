@@ -1,0 +1,22 @@
+# Render Blueprint: a public, read-only demo on Render's free web service.
+# Free instances sleep after ~15 idle minutes and have an ephemeral filesystem, so the demo
+# workspace is re-seeded on every start and uploads are disabled (DATASENTINEL_DEMO_MODE).
+services:
+  - type: web
+    name: datasentinel-demo
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/ready
+    autoDeploy: false
+    envVars:
+      - key: DATASENTINEL_DEMO_MODE
+        value: "true"
+      - key: DATASENTINEL_LOAD_SAMPLES_ON_STARTUP
+        value: "true"
+      - key: DATASENTINEL_EXPERIMENT_RETENTION_HOURS
+        value: "2"
+      - key: DATASENTINEL_MAX_UPLOAD_MB
+        value: "5"
+      - key: DATASENTINEL_CORS_ORIGINS
+        value: https://datasentinel-demo.onrender.com

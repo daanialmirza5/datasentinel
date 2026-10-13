@@ -1,0 +1,46 @@
+# Local container run:     docker compose up --build        -> http://localhost:8000 (override with DATASENTINEL_PORT)
+# With PostgreSQL instead:  docker compose --profile postgres up --build   (see docs/deployment.md)
+services:
+  app:
+    build:
+      context: .
+      args:
+        EXTRAS: "ml postgres"
+    image: datasentinel:local
+    ports:
+      - "${DATASENTINEL_PORT:-8000}:8000"
+    environment:
+      DATASENTINEL_ENVIRONMENT: production
+      DATASENTINEL_CORS_ORIGINS: "http://localhost:${DATASENTINEL_PORT:-8000}"
+      DATASENTINEL_LOAD_SAMPLES_ON_STARTUP: ${DATASENTINEL_LOAD_SAMPLES_ON_STARTUP:-true}
+      DATASENTINEL_DATABASE_URL: ${DATASENTINEL_DATABASE_URL:-}
+    volumes:
+      - datasentinel-data:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  postgres:
+    profiles: ["postgres"]
+    image: postgres:16.10-alpine
+    environment:
+      POSTGRES_DB: datasentinel
+      POSTGRES_USER: datasentinel
+      # Local development only. Use a real secret (environment / secret store) anywhere else.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-datasentinel-local}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U datasentinel"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  datasentinel-data:
+  postgres-data:

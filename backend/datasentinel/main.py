@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from sqlalchemy import func, select
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from datasentinel import __version__
 from datasentinel.api import datasets, drift, experiments, health, lineage, reports, rules, system
@@ -88,7 +91,33 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(experiments.router, prefix=API_PREFIX)
     app.include_router(reports.router, prefix=API_PREFIX)
     app.include_router(system.router, prefix=API_PREFIX)
+    if settings.static_dir is not None:
+        mount_frontend(app, settings.static_dir)
     return app
+
+
+CSP = (
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+    "connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+)
+
+
+def mount_frontend(app: FastAPI, static_dir: Path) -> None:
+    """Serve the built single-page app (single-container deployments). API routes take precedence."""
+    root = static_dir.resolve()
+    index = root / "index.html"
+    if not index.is_file():
+        logger.warning("DATASENTINEL_STATIC_DIR=%s has no index.html; frontend not served", root)
+        return
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def spa(path: str) -> FileResponse:
+        if path.startswith("api/"):
+            raise StarletteHTTPException(status_code=404, detail="Not Found")
+        candidate = (root / path).resolve()
+        if path and candidate.is_file() and candidate.is_relative_to(root):
+            return FileResponse(candidate)
+        return FileResponse(index, headers={"Content-Security-Policy": CSP})
 
 
 app = create_app()

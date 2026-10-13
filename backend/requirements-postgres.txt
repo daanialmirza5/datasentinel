@@ -1,0 +1,2 @@
+# Optional: PostgreSQL support (set DATASENTINEL_DATABASE_URL=postgresql+psycopg://...).
+psycopg[binary]==3.3.6

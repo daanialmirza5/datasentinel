@@ -56,3 +56,32 @@ def test_cors_allows_only_configured_origins(client):
         "/api/v1/health", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "GET"}
     )
     assert "access-control-allow-origin" not in denied.headers
+
+
+def test_serves_built_frontend_with_spa_fallback(tmp_path):
+    static = tmp_path / "dist"
+    (static / "assets").mkdir(parents=True)
+    (static / "index.html").write_text("<html>app</html>")
+    (static / "assets" / "app.js").write_text("console.log(1)")
+    (tmp_path / "secret.txt").write_text("nope")
+    app = create_app(make_settings(tmp_path / "data", static_dir=static))
+    with TestClient(app) as client:
+        assert client.get("/assets/app.js").text == "console.log(1)"
+        deep = client.get("/lineage?dataset=x")
+        assert deep.text == "<html>app</html>" and "frame-ancestors 'none'" in deep.headers["content-security-policy"]
+        assert client.get("/../secret.txt").text != "nope"
+        assert client.get("/api/v1/nope").json()["error"]["code"] == "not_found"
+        assert client.get("/api/v1/health").json()["status"] == "ok"
+
+
+def test_settings_parse_comma_separated_environment_values(monkeypatch, tmp_path):
+    """Regression: list settings must accept the documented comma-separated form, not only JSON."""
+    from datasentinel.config import Settings
+
+    monkeypatch.setenv("DATASENTINEL_CORS_ORIGINS", "http://localhost:8000, https://demo.example")
+    monkeypatch.setenv("DATASENTINEL_DEMO_MODE", "true")
+    settings = Settings(data_dir=tmp_path)
+    assert settings.cors_origins == ["http://localhost:8000", "https://demo.example"]
+    assert settings.demo_mode is True
+    monkeypatch.setenv("DATASENTINEL_CORS_ORIGINS", '["https://json.example"]')
+    assert Settings(data_dir=tmp_path).cors_origins == ["https://json.example"]

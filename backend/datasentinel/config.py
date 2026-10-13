@@ -8,11 +8,13 @@ credentials and must therefore only ever come from the environment.
 
 from __future__ import annotations
 
+import json
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
@@ -33,7 +35,8 @@ class Settings(BaseSettings):
     database_url: str | None = None  # defaults to SQLite inside data_dir
 
     # HTTP
-    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    # Comma-separated in the environment; NoDecode stops pydantic-settings from requiring JSON.
+    cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     log_level: str = "INFO"
 
     # Resource limits
@@ -54,11 +57,15 @@ class Settings(BaseSettings):
     load_samples_on_startup: bool = False
     # Public read-only demo: refuse uploads and edits, keep the fault lab and reports usable.
     demo_mode: bool = False
+    # Serve a built frontend (frontend/dist) from the API process, for single-container deployments.
+    static_dir: Path | None = None
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:
-        if isinstance(value, str) and not value.strip().startswith("["):
+        if isinstance(value, str):
+            if value.strip().startswith("["):
+                return json.loads(value)
             return [part.strip() for part in value.split(",") if part.strip()]
         return value
 
