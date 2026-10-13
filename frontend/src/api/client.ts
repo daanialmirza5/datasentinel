@@ -137,7 +137,7 @@ export const api = {
   faultTypes: (datasetId?: string) => request<{ fault_types: FaultType[] }>('GET', '/experiments/fault-types', { query: { dataset_id: datasetId } }),
   experiments: (query?: Query) => request<Page<Experiment>>('GET', '/experiments', { query }),
   experiment: (id: string) => request<Experiment>('GET', `/experiments/${id}`),
-  createExperiment: (body: { dataset_id: string; fault_type: string; params: Record<string, unknown>; seed: number }) =>
+  createExperiment: (body: { dataset_id: string; version_id?: string; fault_type: string; params: Record<string, unknown>; seed: number }) =>
     request<Experiment>('POST', '/experiments', { body }),
   regenerateExperiment: (id: string, seed?: number) =>
     request<Experiment>('POST', `/experiments/${id}/regenerate`, { body: seed === undefined ? {} : { seed } }),

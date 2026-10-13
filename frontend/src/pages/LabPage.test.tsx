@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import type { Experiment } from '../api/types';
-import { dataset, page } from '../test/fixtures';
+import { dataset, page, version } from '../test/fixtures';
 import { mockApi, renderAt } from '../test/utils';
 import { LabPage } from './LabPage';
 
@@ -41,6 +41,7 @@ function routes() {
     'GET /datasets': () => page([dataset()]),
     'GET /experiments/fault-types': () => faults,
     'GET /experiments': () => page([]),
+    'GET /datasets/ds_orders/versions': () => [version(), version({ id: 'ver_2', version_number: 2 })],
     'POST /experiments': () => experiment(),
     'POST /experiments/exp_1/regenerate': () => experiment({ created_at: '2026-10-01T11:00:00Z' }),
     'DELETE /experiments/exp_1': () => ({ deleted: true }),
@@ -52,12 +53,13 @@ describe('LabPage', () => {
     const { calls } = routes();
     renderAt(<LabPage />, '/lab?dataset=ds_orders');
     await userEvent.selectOptions(await screen.findByLabelText('Target column'), 'amount');
+    await userEvent.selectOptions(await screen.findByLabelText('Base version'), 'ver_2');
     await userEvent.type(screen.getByLabelText('fraction'), '0.2');
     await userEvent.clear(screen.getByLabelText('Random seed'));
     await userEvent.type(screen.getByLabelText('Random seed'), '7');
     await userEvent.click(screen.getByRole('button', { name: 'Inject fault and run detection' }));
 
-    await waitFor(() => expect(calls.find((c) => c.method === 'POST')?.body).toEqual({ dataset_id: 'ds_orders', fault_type: 'missing_values', params: { column: 'amount', fraction: 0.2 }, seed: 7 }));
+    await waitFor(() => expect(calls.find((c) => c.method === 'POST')?.body).toEqual({ dataset_id: 'ds_orders', version_id: 'ver_2', fault_type: 'missing_values', params: { column: 'amount', fraction: 0.2 }, seed: 7 }));
     expect(await screen.findByText('Ground truth (hidden from the detector)')).toBeInTheDocument();
     expect(screen.getByText('True positive')).toBeInTheDocument();
     expect(screen.getByText('False positive')).toBeInTheDocument();

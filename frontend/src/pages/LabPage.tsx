@@ -107,6 +107,8 @@ function ScenarioForm({ dataset, faults, onRan }: { dataset: Dataset; faults: Fa
   const [faultType, setFaultType] = useState(faults[0]?.fault_type ?? '');
   const [values, setValues] = useState<Record<string, string>>({});
   const [seed, setSeed] = useState('42');
+  const versions = useAsync(() => api.versions(dataset.id), [dataset.id]);
+  const [versionId, setVersionId] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const fault = faults.find((f) => f.fault_type === faultType);
@@ -119,7 +121,7 @@ function ScenarioForm({ dataset, faults, onRan }: { dataset: Dataset; faults: Fa
     setError(undefined);
     try {
       const params = buildParams(fault.params_schema, values);
-      onRan(await api.createExperiment({ dataset_id: dataset.id, fault_type: fault.fault_type, params, seed: Number(seed) }));
+      onRan(await api.createExperiment({ dataset_id: dataset.id, ...(versionId ? { version_id: versionId } : {}), fault_type: fault.fault_type, params, seed: Number(seed) }));
     } catch (err) {
       setError(err);
     } finally {
@@ -135,6 +137,16 @@ function ScenarioForm({ dataset, faults, onRan }: { dataset: Dataset; faults: Fa
             {faults.map((f) => (
               <option key={f.fault_type} value={f.fault_type}>
                 {f.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Base version" htmlFor="fault-version" hint="Compare against a clean version: a baseline that already contains a defect masks more of the same.">
+          <select id="fault-version" className={inputClass} value={versionId} onChange={(e) => setVersionId(e.target.value)}>
+            <option value="">Current version (v{dataset.current_version?.version_number})</option>
+            {(versions.data ?? []).map((v) => (
+              <option key={v.id} value={v.id}>
+                v{v.version_number} — {v.original_filename}
               </option>
             ))}
           </select>
