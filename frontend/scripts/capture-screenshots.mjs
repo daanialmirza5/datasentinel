@@ -13,13 +13,13 @@ mkdirSync(out, { recursive: true });
 
 const channel = process.env.PW_CHANNEL ?? 'msedge';
 const browser = await chromium.launch(channel === 'chromium' ? {} : { channel });
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: 1440, height: 960 }, deviceScaleFactor: 1 });
 
 async function shot(name, path, prepare) {
   await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
   if (prepare) await prepare();
   await page.waitForTimeout(400);
-  await page.screenshot({ path: `${out}/${name}.png`, fullPage: true });
+  await page.screenshot({ path: `${out}/${name}.png`, fullPage: false });
   console.log(`captured ${name}`);
 }
 
@@ -46,6 +46,7 @@ await shot('05-lineage-impact', '/lineage', async () => {
 });
 await shot('06-fault-lab', `/lab?dataset=${orders.id}`, async () => {
   await page.getByLabel('Fault', { exact: true }).selectOption('numeric_outliers');
+  await page.getByLabel('Base version').selectOption({ index: 2 });
   await page.getByLabel('Target column').selectOption('amount');
   await page.getByRole('button', { name: 'Inject fault and run detection' }).click();
   await page.getByText('Ground truth (hidden from the detector)').waitFor();
