@@ -81,7 +81,7 @@ function LabWorkspace({ dataset }: { dataset: Dataset }) {
       <div className="min-w-0">
         {experiment ? (
           <ExperimentView
-            key={experiment.id + experiment.created_at}
+            key={experiment.id}
             experiment={experiment}
             onChanged={(exp) => {
               setExperiment(exp ?? undefined);
