@@ -8,10 +8,12 @@ from sqlalchemy.orm import Session
 
 from datasentinel.api.deps import get_db, get_settings_dep
 from datasentinel.config import Settings
+from datasentinel.detection.anomalies import detect_within_version
 from datasentinel.errors import ValidationFailed
 from datasentinel.models import DatasetVersion, DriftResult
 from datasentinel.services import datasets as ds
 from datasentinel.services.drift import get_or_compute_drift, version_ref
+from datasentinel.services.profiles import get_or_compute_profile
 
 router = APIRouter(tags=["drift"])
 
@@ -53,6 +55,23 @@ def get_drift(
         "computed_at": stored.computed_at.isoformat(),
         **stored.result,
     }
+
+
+@router.get("/datasets/{dataset_id}/anomalies")
+def get_anomalies(
+    dataset_id: str,
+    version_id: str | None = None,
+    include_ml: bool = False,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings_dep),
+) -> dict[str, Any]:
+    """Anomalies within one version: robust outliers, daily time-series deviations and (optionally)
+    Isolation Forest row scores. No baseline version is needed."""
+    dataset = ds.get_dataset(session, dataset_id)
+    version = ds.resolve_version(session, dataset, version_id)
+    profile, _ = get_or_compute_profile(session, settings, version)
+    result = detect_within_version(ds.load_table(settings, version), profile.profile, include_ml=include_ml)
+    return {"dataset_id": dataset.id, "version": version_ref(version), **result}
 
 
 @router.get("/datasets/{dataset_id}/drift/history")
