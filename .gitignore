@@ -17,6 +17,7 @@ htmlcov/
 
 # Runtime data (uploaded datasets, SQLite databases, generated lab data)
 backend/var/
+backend/var-*/
 var/
 *.db
 *.db-journal
