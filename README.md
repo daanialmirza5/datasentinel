@@ -55,7 +55,7 @@ not a promise.
 ## Quick start (Windows PowerShell)
 
 ```powershell
-git clone https://github.com/<you>/datasentinel.git
+git clone https://github.com/daanialmirza5/datasentinel.git
 cd datasentinel
 
 # API (http://127.0.0.1:8000, docs at /api/v1/docs)
