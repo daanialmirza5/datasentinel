@@ -103,6 +103,52 @@ def test_downstream_with_own_failure_is_confirmed(client):
     assert {i["name"] for i in summary["impacted"]} >= {"exec dashboard", "forecast model"}
 
 
+def test_recommendations_do_not_duplicate_rules_or_suggest_existing_ones():
+    """Regression: a failed allowed_values rule and a new_category signal on the same column describe
+    one problem; and 'add a range rule' must not be suggested when such a rule already exists."""
+    health = {
+        "state": "failing",
+        "version_number": 2,
+        "dataset_id": "ds",
+        "version_id": "v",
+        "failed_rules": [
+            {
+                "rule_name": "currency values",
+                "rule_type": "allowed_values",
+                "column": "currency",
+                "severity": "high",
+                "violation_count": 5,
+                "message": "5 values not allowed",
+                "recommendation": "Confirm the new values",
+            }
+        ],
+        "breaking_changes": [],
+        "anomaly_signals": [
+            {
+                "category": "new_category",
+                "severity": "medium",
+                "column": "currency",
+                "title": "JPY appeared",
+                "evidence": {"new_values": {"JPY": 5}},
+            },
+            {
+                "category": "numeric_outlier",
+                "severity": "high",
+                "column": "amount",
+                "title": "extreme amounts",
+                "evidence": {},
+            },
+        ],
+    }
+    recs = build_recommendations("orders", health, [], None, existing_rules={("amount", "range")})
+    titles = [r["title"] for r in recs]
+    assert "Review the unexpected values in 'currency'" not in titles
+    assert "Investigate failed rule 'currency values'" in titles
+    assert not any(t.startswith("Add a 'range' rule") for t in titles)
+    assert not any(t.startswith("Add a 'allowed_values' rule") for t in titles)
+    assert "Validate the expected range of 'amount'" in titles
+
+
 def test_recommendations_without_restore_point_suggest_reexport():
     health = {
         "state": "failing",

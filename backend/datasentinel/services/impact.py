@@ -22,7 +22,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from datasentinel.lineage.graph import downstream
-from datasentinel.models import Dataset, DatasetVersion, LineageAsset
+from datasentinel.models import Dataset, DatasetVersion, LineageAsset, QualityRule
 from datasentinel.recommendations import build_recommendations
 from datasentinel.services.lineage import asset_dict, asset_health, build_graph
 from datasentinel.services.validation import latest_run
@@ -58,6 +58,15 @@ def restore_candidate(session: Session, health: dict[str, Any]) -> dict[str, Any
                 "evidence": f"passed all {run.summary['total']} enabled rules on {run.started_at.date().isoformat()}",
             }
     return None
+
+
+def _existing_rules(session: Session, dataset_id: str | None) -> set[tuple[str | None, str]]:
+    if not dataset_id:
+        return set()
+    return {
+        (r.column_name, r.rule_type)
+        for r in session.scalars(select(QualityRule).where(QualityRule.dataset_id == dataset_id))
+    }
 
 
 def _classify(origin_state: str, distance: int, own_state: str) -> str:
@@ -134,7 +143,9 @@ def impact_analysis(session: Session, asset: LineageAsset) -> dict[str, Any]:
         "impacted": impacted,
         "counts": counts,
         "restore_candidate": restore,
-        "recommendations": build_recommendations(asset.name, origin_health, impacted, restore),
+        "recommendations": build_recommendations(
+            asset.name, origin_health, impacted, restore, existing_rules=_existing_rules(session, asset.dataset_id)
+        ),
     }
 
 

@@ -1,13 +1,20 @@
 """Anomalies *within* a single version (no baseline required).
 
 * **Numeric outliers** — modified z-score |0.6745·(x − median)/MAD| > 3.5 (Iglewicz & Hoaglin).
-  Robust to the outliers themselves, unlike the mean/standard-deviation z-score. When MAD is zero
-  (more than half the values identical) Tukey's far-out fences (3 × IQR) are used instead; when
-  both spreads are zero the column is skipped. Needs at least 8 values. Outliers in a single
+  Robust to the outliers themselves, unlike the mean/standard-deviation z-score. Strictly positive,
+  right-skewed columns (sample skewness > 1, e.g. prices, amounts) are scored on the log scale,
+  where multiplicative data is roughly symmetric. When MAD is zero (more than half the values
+  identical) Tukey's far-out fences (3 × IQR) are used instead; when both spreads are zero the
+  column is skipped. Needs at least 8 values. If a method would flag more than 5% of a column, the
+  column is reported as *not applicable* rather than as outliers (zero-inflated, heavy-tailed or
+  multi-modal data violates the method's assumption that outliers are rare). Outliers in a single
   version are often legitimate (large orders, real spikes) and are reported at *low* severity.
 * **Time-series deviations** — when a datetime column spans at least 14 distinct days, rows are
   bucketed per UTC day and the daily row count and daily mean of each numeric column are scored
-  with the same robust z-score across days. Days with |z| > 3.5 are reported. Seasonality is not
+  with the same robust z-score across days. Days with |z| > 3.5 are reported. The most complete
+  timestamp column is used, and the first and last day (usually partial buckets) are not scored.
+  Days need a median of at least 10 rows; sparser data is not scored because a daily mean of one or
+  two rows is noise, not a trend. Seasonality is not
   modelled, so strongly weekly-periodic data may produce weekday signals — documented limitation.
 * **Isolation Forest (optional)** — multivariate, unsupervised; only runs when scikit-learn is
   installed. Uses a fixed random seed, robust-scaled numeric columns and median imputation. It
@@ -32,6 +39,9 @@ MIN_DAYS = 14
 MAX_TS_METRICS = 8
 ML_MIN_ROWS = 50
 ML_MAX_ROWS = 100_000
+SKEW_FOR_LOG = 1.0
+MIN_ROWS_PER_DAY = 10
+MAX_OUTLIER_PCT = 5.0
 
 
 def _robust_z(values: np.ndarray) -> np.ndarray | None:
@@ -51,30 +61,47 @@ def _measure_columns(table: LoadedTable, profile: dict[str, Any]) -> list[str]:
     ]
 
 
-def numeric_outliers(table: LoadedTable, profile: dict[str, Any]) -> list[dict[str, Any]]:
-    results = []
+def numeric_outliers(table: LoadedTable, profile: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Return (outliers, not_applicable). See the module docstring for the method and safeguards."""
+    results, skipped = [], []
     for column in _measure_columns(table, profile):
         series = table.typed[column].astype("float64")
         valid = series.notna().to_numpy()
         values = series.to_numpy()[valid]
         if values.size < MIN_VALUES:
             continue
-        z = _robust_z(values)
-        method = "modified_z (MAD)"
+        scale = "linear"
+        scored = values
+        if values.min() > 0 and values.size > 2 and float(pd.Series(values).skew()) > SKEW_FOR_LOG:
+            scored, scale = np.log(values), "log"
+        z = _robust_z(scored)
+        method = f"modified_z (MAD, {scale} scale)"
         if z is not None:
             mask = np.abs(z) > MAD_THRESHOLD
             score = np.abs(z)
         else:
-            q1, q3 = np.percentile(values, [25, 75])
+            q1, q3 = np.percentile(scored, [25, 75])
             iqr = q3 - q1
             if iqr == 0:
                 continue
             lo, hi = q1 - 3 * iqr, q3 + 3 * iqr
-            mask = (values < lo) | (values > hi)
-            score = np.maximum(lo - values, values - hi) / iqr
-            method = "tukey_far_out (3 x IQR)"
+            mask = (scored < lo) | (scored > hi)
+            score = np.maximum(lo - scored, scored - hi) / iqr
+            method = f"tukey_far_out (3 x IQR, {scale} scale)"
         count = int(mask.sum())
         if not count:
+            continue
+        pct = 100 * count / values.size
+        if pct > MAX_OUTLIER_PCT:
+            skipped.append(
+                {
+                    "column": column,
+                    "method": method,
+                    "flagged_pct": round(pct, 2),
+                    "reason": f"The method would flag {pct:.1f}% of values; outliers are rare by definition, so the "
+                    "distribution (heavy-tailed, zero-inflated or multi-modal) is not suited to this test.",
+                }
+            )
             continue
         positions = np.flatnonzero(valid)[mask]
         order = np.argsort(-score[mask], kind="stable")[:5]
@@ -92,12 +119,12 @@ def numeric_outliers(table: LoadedTable, profile: dict[str, Any]) -> list[dict[s
                 "method": method,
                 "threshold": MAD_THRESHOLD if z is not None else 3.0,
                 "count": count,
-                "pct": round(100 * count / values.size, 4),
+                "pct": round(pct, 4),
                 "median": clean(np.median(values)),
                 "examples": examples,
             }
         )
-    return results
+    return results, skipped
 
 
 def time_series_deviations(table: LoadedTable, profile: dict[str, Any]) -> dict[str, Any] | None:
@@ -106,7 +133,8 @@ def time_series_deviations(table: LoadedTable, profile: dict[str, Any]) -> dict[
     ]
     if not candidates:
         return None
-    ts_column = max(candidates, key=lambda c: c["distinct_days"])["name"]
+    # Prefer the most complete timestamp (e.g. order time over ship time), then the longest span.
+    ts_column = max(candidates, key=lambda c: (c["non_null_count"], c["distinct_days"]))["name"]
     days = table.typed[ts_column].dt.floor("D")
     frame = pd.DataFrame({"day": days})
     metrics = _measure_columns(table, profile)[:MAX_TS_METRICS]
@@ -118,10 +146,26 @@ def time_series_deviations(table: LoadedTable, profile: dict[str, Any]) -> dict[
     for column in metrics:
         daily[f"mean({column})"] = grouped[column].mean()
     daily = daily.sort_index()
-    deviations = []
+    # The first and last day are usually partial buckets (an export starting or ending mid-day, or
+    # events spilling past the extract window); they are charted but never scored.
+    scored_days = daily.iloc[1:-1]
+    deviations: list[dict[str, Any]] = []
+    median_rows = float(daily["row_count"].median()) if len(daily) else 0.0
+    if median_rows < MIN_ROWS_PER_DAY:
+        return {
+            "column": ts_column,
+            "days": len(daily),
+            "metrics_checked": [],
+            "deviations": [],
+            "series": {
+                "row_count": [{"date": d.date().isoformat(), "value": clean(v)} for d, v in daily["row_count"].items()]
+            },
+            "skipped": f"Only {median_rows:g} rows per day (median); daily aggregates need at least {MIN_ROWS_PER_DAY} "
+            "to be stable, so no day was scored.",
+        }
     checked = []
     for metric in daily.columns:
-        values = daily[metric].to_numpy(dtype=float)
+        values = scored_days[metric].to_numpy(dtype=float)
         valid = ~np.isnan(values)
         if valid.sum() < MIN_DAYS:
             continue
@@ -130,7 +174,7 @@ def time_series_deviations(table: LoadedTable, profile: dict[str, Any]) -> dict[
             continue
         checked.append(metric)
         median = float(np.median(values[valid]))
-        for day, value, score in zip(daily.index[valid], values[valid], z, strict=True):
+        for day, value, score in zip(scored_days.index[valid], values[valid], z, strict=True):
             if abs(score) > MAD_THRESHOLD:
                 deviations.append(
                     {
@@ -198,7 +242,7 @@ def isolation_forest(table: LoadedTable, profile: dict[str, Any], seed: int = 0)
 
 
 def detect_within_version(table: LoadedTable, profile: dict[str, Any], include_ml: bool = False) -> dict[str, Any]:
-    outliers = numeric_outliers(table, profile)
+    outliers, not_applicable = numeric_outliers(table, profile)
     ts = time_series_deviations(table, profile)
     signals: list[Signal] = []
     for item in outliers:
@@ -230,6 +274,7 @@ def detect_within_version(table: LoadedTable, profile: dict[str, Any], include_m
             )
     return {
         "outliers": outliers,
+        "outliers_not_applicable": not_applicable,
         "time_series": ts,
         "ml": isolation_forest(table, profile) if include_ml else None,
         "signals": sort_signals([s.as_dict() for s in signals]),

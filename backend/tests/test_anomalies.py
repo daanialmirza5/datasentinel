@@ -21,7 +21,7 @@ def load(frame: pd.DataFrame):
 def test_mad_outliers_with_examples_sorted_by_score():
     values = [10.0 + (i % 5) * 0.5 for i in range(100)] + [250.0, -90.0]
     table, profile = load(pd.DataFrame({"x": values}))
-    [result] = numeric_outliers(table, profile)
+    [result], _ = numeric_outliers(table, profile)
     assert result["count"] == 2
     assert result["method"].startswith("modified_z")
     assert [e["row"] for e in result["examples"]] == [101, 102]
@@ -29,19 +29,39 @@ def test_mad_outliers_with_examples_sorted_by_score():
 
 def test_constant_and_tiny_columns_are_skipped():
     table, profile = load(pd.DataFrame({"constant": [5] * 50, "tiny": [1, 2, 3, 400] + [None] * 46}))
-    assert numeric_outliers(table, profile) == []
+    assert numeric_outliers(table, profile)[0] == []
 
 
 def test_mad_zero_falls_back_to_iqr():
     values = [1.0] * 60 + [2.0] * 40 + [50.0]
     table, profile = load(pd.DataFrame({"x": values}))
-    [result] = numeric_outliers(table, profile)
+    [result], _ = numeric_outliers(table, profile)
     assert result["method"].startswith("tukey") and result["count"] == 1
+
+
+def test_skewed_positive_data_uses_log_scale_and_flags_scaling_errors():
+    rng = np.random.default_rng(3)
+    amounts = np.round(rng.lognormal(3.5, 0.6, 2000), 2)
+    amounts[:10] *= 100  # cents-vs-units bug
+    table, profile = load(pd.DataFrame({"amount": amounts}))
+    [result], skipped = numeric_outliers(table, profile)
+    assert "log scale" in result["method"] and not skipped
+    assert result["count"] >= 10 and result["pct"] < 2
+    assert {e["row"] for e in result["examples"]} <= set(range(1, 11))
+
+
+def test_zero_inflated_columns_are_not_applicable_rather_than_noisy():
+    rng = np.random.default_rng(4)
+    discounts = np.where(rng.random(2000) < 0.7, 0.0, np.round(rng.uniform(1, 30, 2000), 2))
+    table, profile = load(pd.DataFrame({"discount": discounts}))
+    outliers, skipped = numeric_outliers(table, profile)
+    assert outliers == []
+    assert skipped[0]["column"] == "discount" and skipped[0]["flagged_pct"] > 5
 
 
 def test_identifier_columns_excluded():
     table, profile = load(pd.DataFrame({"order_id": [*range(100), 10**9]}))
-    assert numeric_outliers(table, profile) == []
+    assert numeric_outliers(table, profile)[0] == []
 
 
 def test_time_series_requires_enough_days():
@@ -51,6 +71,12 @@ def test_time_series_requires_enough_days():
     )
     table, profile = load(short)
     assert detect_within_version(table, profile)["time_series"] is None
+
+
+def test_sparse_daily_data_is_not_scored():
+    table = build_table(parse_bytes(sample_bytes("customers.csv"), "csv", ParseLimits()))
+    ts = detect_within_version(table, profile_table(table))["time_series"]
+    assert ts["deviations"] == [] and "rows per day" in ts["skipped"]
 
 
 def test_sensor_sample_finds_the_stuck_sensor_day():

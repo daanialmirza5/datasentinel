@@ -105,16 +105,25 @@ def _numeric_values(table: LoadedTable, column: str) -> np.ndarray:
 
 
 def _shared_histogram(base: np.ndarray, cand: np.ndarray, bins: int) -> dict[str, Any]:
-    lo = float(min(base.min(), cand.min()))
-    hi = float(max(base.max(), cand.max()))
-    if lo == hi:
-        hi = lo + 1.0
-    edges = np.linspace(lo, hi, bins + 1)
+    """Bins at the baseline's quantiles plus open tail bins below its minimum / above its maximum.
+
+    Equal-width bins collapse when a few extreme values stretch the range; quantile bins keep the
+    bulk readable (each holds ~1/bins of the baseline) and the tail bins show exactly how much of
+    the candidate falls outside anything seen before.
+    """
+    edges = np.unique(np.quantile(base, np.linspace(0, 1, bins + 1)))
+    if edges.size < 2:
+        edges = np.array([edges[0], edges[0] + 1.0])
+    below_b, below_c = (base < edges[0]).mean(), (cand < edges[0]).mean()
+    above_b, above_c = (base > edges[-1]).mean(), (cand > edges[-1]).mean()
+    inner_b = np.histogram(base[(base >= edges[0]) & (base <= edges[-1])], bins=edges)[0] / base.size
+    inner_c = np.histogram(cand[(cand >= edges[0]) & (cand <= edges[-1])], bins=edges)[0] / cand.size
     return {
         "kind": "numeric",
+        "binning": "baseline_quantiles_with_tails",
         "edges": [clean(e) for e in edges],
-        "base": (np.histogram(base, bins=edges)[0] / base.size).round(6).tolist(),
-        "candidate": (np.histogram(cand, bins=edges)[0] / cand.size).round(6).tolist(),
+        "base": np.round(np.concatenate([[below_b], inner_b, [above_b]]), 6).tolist(),
+        "candidate": np.round(np.concatenate([[below_c], inner_c, [above_c]]), 6).tolist(),
     }
 
 

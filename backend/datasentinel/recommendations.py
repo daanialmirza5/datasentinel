@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from datasentinel.detection.signals import SEVERITY_RANK
+from datasentinel.rules.engine import RULE_TYPES
 
 KIND_ORDER = {"contain": 0, "investigate": 1, "recover": 2, "verify": 3, "prevent": 4}
 
@@ -100,8 +101,13 @@ def build_recommendations(
     health: dict[str, Any],
     impacted: list[dict[str, Any]] | None = None,
     restore_candidate: dict[str, Any] | None = None,
+    existing_rules: set[tuple[str | None, str]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Derive recommendations from an asset's health evidence and its downstream impact."""
+    """Derive recommendations from an asset's health evidence and its downstream impact.
+
+    ``existing_rules`` holds (column, rule_type) for every rule on the dataset, enabled or not, so a
+    "add a rule" suggestion is never made for a rule that already exists.
+    """
     recs: list[dict[str, Any]] = []
     impacted = impacted or []
     failed_rules = health.get("failed_rules", [])
@@ -142,7 +148,12 @@ def build_recommendations(
             }
         )
 
-    seen: set[tuple[str, str | None]] = set()
+    # A failed rule and a statistical signal often describe the same problem; keep the rule's item.
+    seen: set[tuple[str, str | None]] = {
+        (RULE_TYPES[r["rule_type"]]["signal_category"], r.get("column"))
+        for r in failed_rules
+        if r.get("rule_type") in RULE_TYPES
+    }
     for signal in sorted(signals, key=lambda s: -SEVERITY_RANK.get(s["severity"], 0)):
         key = (signal["category"], signal.get("column"))
         if key in seen or signal["category"] not in SIGNAL_ACTIONS:
@@ -215,19 +226,12 @@ def build_recommendations(
                     }
                 )
 
-    covered = {(r.get("column"), r.get("rule_type")) for r in failed_rules}
+    covered = set(existing_rules or set()) | {(r.get("column"), r.get("rule_type")) for r in failed_rules}
+    rule_for = {"null_rate_increase": "not_null", "new_category": "allowed_values", "numeric_outlier": "range"}
     for signal in signals:
         column = signal.get("column")
-        if (
-            column
-            and signal["category"] in ("null_rate_increase", "new_category", "numeric_outlier")
-            and (column, signal["category"]) not in covered
-        ):
-            rule_type = {
-                "null_rate_increase": "not_null",
-                "new_category": "allowed_values",
-                "numeric_outlier": "range",
-            }[signal["category"]]
+        if column and signal["category"] in rule_for and (column, rule_for[signal["category"]]) not in covered:
+            rule_type = rule_for[signal["category"]]
             recs.append(
                 {
                     "kind": "prevent",
@@ -237,7 +241,7 @@ def build_recommendations(
                     "evidence": [signal["title"]],
                 }
             )
-            covered.add((column, signal["category"]))
+            covered.add((column, rule_type))
 
     recs.sort(key=lambda r: KIND_ORDER[r["kind"]])
     for index, rec in enumerate(recs, start=1):
