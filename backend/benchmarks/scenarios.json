@@ -1,0 +1,21 @@
+{
+  "description": "Evaluation configuration. Development and unit tests use seeds below 100. A first evaluation on seeds 1000-1009 (results/run1-seeds-1000.md) exposed one weakness (outliers in zero-inflated columns) that was then fixed. A second run on seeds 2000-2009 (results/run2-seeds-2000.md) showed a 10% healthy false-positive rate caused by treating the estimated baseline outlier rate as known; the test was corrected to a two-sample comparison. A third run on seeds 3000-3009 (results/run3-seeds-3000.md) still showed false alarms from one atypical baseline because linear-scale fences sit inside the natural tail of skewed amounts; outlier fences were moved to the log scale for strictly positive skewed columns (the rule the within-version detector already used). The reported run uses the untouched seed range 4000+ and is reported as-is.",
+  "replicates": 10,
+  "base_seed": 4000,
+  "rows": 2500,
+  "faults": [
+    {"fault_type": "missing_values", "intensities": {"low": {"fraction": 0.01}, "default": {"fraction": 0.05}, "high": {"fraction": 0.2}}},
+    {"fault_type": "duplicate_records", "intensities": {"low": {"fraction": 0.002}, "default": {"fraction": 0.02}, "high": {"fraction": 0.05}}},
+    {"fault_type": "numeric_outliers", "intensities": {"low": {"fraction": 0.005, "factor": 5}, "default": {"fraction": 0.02, "factor": 50}, "high": {"fraction": 0.05, "factor": 100}}},
+    {"fault_type": "schema_type_change", "intensities": {"low": {"fraction": 0.02}, "default": {"fraction": 0.5}, "high": {"fraction": 1.0}}},
+    {"fault_type": "column_removal", "intensities": {"default": {}}},
+    {"fault_type": "unexpected_categories", "intensities": {"low": {"fraction": 0.002}, "default": {"fraction": 0.01}, "high": {"fraction": 0.05}}},
+    {"fault_type": "row_count_reduction", "intensities": {"low": {"fraction": 0.1}, "default": {"fraction": 0.25}, "high": {"fraction": 0.5}}},
+    {"fault_type": "timestamp_corruption", "intensities": {"low": {"fraction": 0.002}, "default": {"fraction": 0.01}, "high": {"fraction": 0.05}}},
+    {"fault_type": "referential_integrity", "intensities": {"low": {"fraction": 0.002}, "default": {"fraction": 0.01}, "high": {"fraction": 0.05}}},
+    {"fault_type": "distribution_shift", "intensities": {"low": {"shift_std": 0.1}, "default": {"shift_std": 0.3}, "high": {"shift_std": 1.0}}}
+  ],
+  "healthy_controls": ["same_month_redraw", "next_month_redraw"],
+  "lineage": {"graphs": 200, "nodes": 30, "edge_probability": 0.08, "seed": 2024},
+  "scaling_rows": [10000, 100000]
+}
