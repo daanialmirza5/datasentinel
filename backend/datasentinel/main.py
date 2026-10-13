@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from datasentinel import __version__
-from datasentinel.api import datasets, drift, health, rules
+from datasentinel.api import datasets, drift, health, lineage, rules
 from datasentinel.config import Settings, get_settings
 from datasentinel.db import build_engine, make_session_factory, run_migrations
 from datasentinel.errors import install_error_handlers
@@ -64,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(datasets.router, prefix=API_PREFIX)
     app.include_router(rules.router, prefix=API_PREFIX)
     app.include_router(drift.router, prefix=API_PREFIX)
+    app.include_router(lineage.router, prefix=API_PREFIX)
     return app
 
 
