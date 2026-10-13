@@ -219,3 +219,28 @@ def test_storage_rejects_path_traversal(tmp_path):
     with pytest.raises(StorageError):
         storage.write("ver_0123456789abcdef.csv", b"overwrite")
     assert storage.read("ver_0123456789abcdef.csv") == b"a\n1\n"
+
+
+def _nested_list(depth: int):
+    root = current = []
+    for _ in range(depth):
+        child = []
+        current.append(child)
+        current = child
+    return root
+
+
+def test_rejected_record_preview_survives_extreme_nesting():
+    """Regression (seen on Linux / Python 3.14, where json.loads accepts deeper nesting than on
+    Windows): previewing a rejected nested record must not raise RecursionError."""
+    from datasentinel.ingestion.parser import _preview
+
+    assert "nested too deeply" in _preview(_nested_list(200_000))
+    assert _preview([1, 2]) == "[1, 2]"
+
+
+def test_deeply_nested_field_values_are_refused_cleanly():
+    from datasentinel.ingestion.parser import _json_cell
+
+    with pytest.raises(ValidationFailed, match="too deep"):
+        _json_cell(_nested_list(200_000), LIMITS)

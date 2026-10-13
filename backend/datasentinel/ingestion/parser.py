@@ -228,8 +228,20 @@ def _json_cell(value: Any, limits: ParseLimits) -> str | None:
     elif isinstance(value, str):
         return _clean_cell(value) if len(value) <= limits.max_cell_chars else value
     else:  # lists, deeply nested objects
-        text = json.dumps(value, ensure_ascii=False, sort_keys=True)
+        try:
+            text = json.dumps(value, ensure_ascii=False, sort_keys=True)
+        except RecursionError as exc:
+            # How deep json.loads can go depends on the platform's C stack, so encoding is guarded too.
+            raise ValidationFailed("JSON nesting is too deep.") from exc
     return text
+
+
+def _preview(item: Any) -> str:
+    """Short text preview of a rejected JSON value that cannot fail on deeply nested input."""
+    try:
+        return json.dumps(item)[:200]
+    except (RecursionError, ValueError):
+        return f"<{type(item).__name__} nested too deeply to preview>"
 
 
 def _records_to_frame(records: list[tuple[int, dict[str, Any]]], limits: ParseLimits, result: ParsedTable) -> None:
@@ -296,7 +308,7 @@ def parse_json(text: str, limits: ParseLimits, result: ParsedTable) -> None:
         if isinstance(item, dict):
             records.append((index, item))
         else:
-            result.reject(index, f"Record is a {type(item).__name__}, not an object", json.dumps(item)[:200])
+            result.reject(index, f"Record is a {type(item).__name__}, not an object", _preview(item))
     if not records:
         raise ValidationFailed("The JSON array contains no objects.")
     _records_to_frame(records, limits, result)
