@@ -17,11 +17,13 @@ from datasentinel.schemas import (
     ImportResponse,
     Page,
     PreviewOut,
+    ProfileOut,
     QuarantineRequest,
     RejectedRowsOut,
     VersionOut,
 )
 from datasentinel.services import datasets as svc
+from datasentinel.services.profiles import get_or_compute_profile
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
@@ -201,6 +203,18 @@ def preview(
         columns=[ColumnSchema(**c) for c in table.schema], rows=rows,
         row_numbers=[int(i) + 1 for i in page.index], total=len(table.raw), offset=offset, limit=limit,
     )
+
+
+@router.get("/{dataset_id}/profile", response_model=ProfileOut)
+def get_profile(dataset_id: str, version_id: str | None = None, session: Session = Depends(get_db),
+                settings: Settings = Depends(get_settings_dep)) -> ProfileOut:
+    """Exact column statistics for a version (defaults to the current version). Cached per version."""
+    dataset = svc.get_dataset(session, dataset_id)
+    version = svc.resolve_version(session, dataset, version_id)
+    stored, cached = get_or_compute_profile(session, settings, version)
+    return ProfileOut(dataset_id=dataset.id, version_id=version.id, version_number=version.version_number,
+                      computed_at=stored.computed_at, duration_ms=round(stored.duration_ms, 2), cached=cached,
+                      profile=stored.profile)
 
 
 @router.get("/{dataset_id}/rejected-rows", response_model=RejectedRowsOut)

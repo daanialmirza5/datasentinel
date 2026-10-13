@@ -84,6 +84,16 @@ class PreviewOut(BaseModel):
     limit: int
 
 
+class ProfileOut(BaseModel):
+    dataset_id: str
+    version_id: str
+    version_number: int
+    computed_at: datetime
+    duration_ms: float
+    cached: bool
+    profile: dict[str, Any]
+
+
 class RejectedRowsOut(BaseModel):
     version_id: str
     total: int

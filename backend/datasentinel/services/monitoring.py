@@ -10,8 +10,9 @@ from sqlalchemy.orm import Session
 
 from datasentinel.config import Settings
 from datasentinel.models import DatasetVersion
+from datasentinel.services.profiles import get_or_compute_profile
 
 
 def analyze_new_version(session: Session, settings: Settings, version: DatasetVersion) -> None:
-    """Hook for profiling, rule validation and drift analysis (added as those engines land)."""
-    return None
+    """Profile the version (cached for later comparisons)."""
+    get_or_compute_profile(session, settings, version)
