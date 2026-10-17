@@ -5,7 +5,7 @@ import { ComparisonChart } from '../components/charts';
 import { DatasetPicker } from '../components/DatasetPicker';
 import { useDatasets, useSelectedDataset } from '../hooks/useDatasets';
 import { Badge, Card, EmptyState, ErrorState, Loading, PageHeader, SeverityBadge } from '../components/ui';
-import { formatNumber, inputClass } from '../lib/format';
+import { formatNumber, formatPercent, inputClass } from '../lib/format';
 import { useAsync } from '../hooks/useAsync';
 
 export function DriftPage() {
@@ -162,7 +162,7 @@ export function SignalList({ signals }: { signals: Signal[] }) {
 function ComparisonCard({ comparison: c, baseLabel, candidateLabel }: { comparison: ColumnComparison; baseLabel: string; candidateLabel: string }) {
   const facts: string[] = [];
   if (c.base_type !== c.candidate_type) facts.push(`type ${c.base_type} → ${c.candidate_type}`);
-  if (c.null_rate?.delta_pp !== undefined) facts.push(`missing ${formatNumber(c.null_rate.base_pct)}% → ${formatNumber(c.null_rate.candidate_pct)}%`);
+  if (c.null_rate?.delta_pp !== undefined) facts.push(`missing ${formatPercent(c.null_rate.base_pct)} → ${formatPercent(c.null_rate.candidate_pct)}`);
   if (c.distribution?.ks_statistic !== undefined) facts.push(`KS D=${formatNumber(c.distribution.ks_statistic, 3)} (p=${c.distribution.p_value?.toExponential(1)})`);
   if (c.distribution?.psi !== undefined && c.distribution.psi !== null) facts.push(`PSI ${formatNumber(c.distribution.psi, 3)}`);
   if (c.categories?.psi !== undefined) facts.push(`category PSI ${formatNumber(c.categories.psi, 3)}`);
