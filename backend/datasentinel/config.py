@@ -17,6 +17,7 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
+_LOG_LEVELS = ("CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG")
 
 
 class Settings(BaseSettings):
@@ -72,6 +73,14 @@ class Settings(BaseSettings):
             # Browsers send Origin without a trailing slash, so "http://host/" would never match.
             return [str(part).strip().rstrip("/") for part in value if str(part).strip()]
         return value
+
+    @field_validator("log_level")
+    @classmethod
+    def _check_log_level(cls, value: str) -> str:
+        level = value.strip().upper()
+        if level not in _LOG_LEVELS:
+            raise ValueError(f"log_level must be one of {', '.join(_LOG_LEVELS)}")
+        return level
 
     @property
     def max_upload_bytes(self) -> int:
