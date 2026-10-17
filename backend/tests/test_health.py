@@ -99,3 +99,9 @@ def test_settings_parse_comma_separated_environment_values(monkeypatch, tmp_path
     assert settings.demo_mode is True
     monkeypatch.setenv("DATASENTINEL_CORS_ORIGINS", '["https://json.example"]')
     assert Settings(data_dir=tmp_path).cors_origins == ["https://json.example"]
+
+
+def test_wrong_method_uses_named_error_code(client):
+    response = client.post("/api/v1/health")
+    assert response.status_code == 405
+    assert response.json()["error"]["code"] == "method_not_allowed"
