@@ -246,3 +246,14 @@ def test_deeply_nested_field_values_are_refused_cleanly():
 
     with pytest.raises(ValidationFailed, match="too deep"):
         _json_cell(_nested_list(200_000), LIMITS)
+
+
+def test_numeric_header_row_is_flagged_as_possibly_missing():
+    result = parse_bytes(b"1,2,3\n4,5,6\n", "csv", ParseLimits())
+    assert any("missing a header" in warning for warning in result.warnings)
+
+
+def test_tsv_file_is_parsed_with_tab_delimiter():
+    result = parse_bytes(b"id\tname\n1\tAda, Lovelace\n2\tGrace\n", "csv", ParseLimits())
+    assert result.delimiter == "\t"
+    assert result.frame["name"].tolist() == ["Ada, Lovelace", "Grace"]
