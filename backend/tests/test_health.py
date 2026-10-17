@@ -15,6 +15,18 @@ def test_health_reports_ok(client):
     assert "x-request-id" in response.headers
 
 
+def test_well_formed_incoming_request_id_is_reused(client):
+    response = client.get("/api/v1/does-not-exist", headers={"X-Request-ID": "proxy-abc12345"})
+    assert response.headers["x-request-id"] == "proxy-abc12345"
+    assert response.json()["request_id"] == "proxy-abc12345"
+
+
+def test_malformed_incoming_request_id_is_replaced(client):
+    response = client.get("/api/v1/health", headers={"X-Request-ID": "bad id\twith<script>"})
+    assert response.headers["x-request-id"] != "bad id\twith<script>"
+    assert len(response.headers["x-request-id"]) == 16
+
+
 def test_unknown_route_uses_error_envelope(client):
     response = client.get("/api/v1/does-not-exist")
     assert response.status_code == 404

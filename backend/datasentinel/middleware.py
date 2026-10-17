@@ -3,10 +3,21 @@
 from __future__ import annotations
 
 import json
+import re
 import uuid
 
 from starlette.exceptions import HTTPException
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
+
+# A proxy-supplied id is reused only when it is short and plain, so it is safe to log and echo.
+_REQUEST_ID = re.compile(rb"[A-Za-z0-9_.-]{8,64}")
+
+
+def _incoming_request_id(scope: Scope) -> str | None:
+    for name, value in scope.get("headers", []):
+        if name == b"x-request-id" and _REQUEST_ID.fullmatch(value):
+            return value.decode("ascii")
+    return None
 
 
 class RequestContextMiddleware:
@@ -19,7 +30,7 @@ class RequestContextMiddleware:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
-        request_id = uuid.uuid4().hex[:16]
+        request_id = _incoming_request_id(scope) or uuid.uuid4().hex[:16]
         scope.setdefault("state", {})["request_id"] = request_id
 
         async def send_wrapper(message: Message) -> None:
