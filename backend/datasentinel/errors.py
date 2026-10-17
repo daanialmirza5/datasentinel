@@ -80,11 +80,14 @@ _STATUS_CODES = {
     403: "forbidden",
     404: "not_found",
     405: "method_not_allowed",
+    406: "not_acceptable",
+    408: "request_timeout",
     409: "conflict",
     413: "payload_too_large",
     415: "unsupported_media_type",
     422: "validation_failed",
     429: "too_many_requests",
+    503: "service_unavailable",
 }
 
 
