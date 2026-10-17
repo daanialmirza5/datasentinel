@@ -2783,7 +2783,7 @@
       "anyOf": [
        {
         "type": "string",
-        "pattern": "^(csv|json|jsonl)$"
+        "pattern": "^(?i)\\s*(csv|tsv|json|jsonl|ndjson)\\s*$"
        },
        {
         "type": "null"
