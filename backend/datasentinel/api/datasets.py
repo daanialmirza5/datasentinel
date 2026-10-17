@@ -67,7 +67,7 @@ def import_dataset(
     dataset_name: Annotated[str | None, Form(max_length=120)] = None,
     dataset_id: Annotated[str | None, Form(max_length=40)] = None,
     description: Annotated[str, Form(max_length=2000)] = "",
-    file_format: Annotated[str | None, Form(pattern=r"^(csv|json|jsonl)$")] = None,
+    file_format: Annotated[str | None, Form(pattern=r"^(?i)\s*(csv|tsv|json|jsonl|ndjson)\s*$")] = None,
     session: Session = Depends(get_db),
     settings: Settings = Depends(get_settings_dep),
 ) -> ImportResponse:

@@ -134,3 +134,8 @@ def test_all_sample_files_import(client):
     assert types["dimensions.weight_kg"] == "float"
     assert types["in_stock"] == "boolean"
     assert types["launched_on"] == "datetime"
+
+
+def test_import_accepts_format_aliases(client):
+    body = import_ok(client, b'{"id": 1, "v": "a"}\n{"id": 2, "v": "b"}\n', "export.txt", file_format="NDJSON")
+    assert body["version"]["file_format"] == "jsonl"
