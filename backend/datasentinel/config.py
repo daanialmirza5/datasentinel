@@ -65,8 +65,12 @@ class Settings(BaseSettings):
     def _split_origins(cls, value: object) -> object:
         if isinstance(value, str):
             if value.strip().startswith("["):
-                return json.loads(value)
-            return [part.strip() for part in value.split(",") if part.strip()]
+                value = json.loads(value)
+            else:
+                value = value.split(",")
+        if isinstance(value, list):
+            # Browsers send Origin without a trailing slash, so "http://host/" would never match.
+            return [str(part).strip().rstrip("/") for part in value if str(part).strip()]
         return value
 
     @property
