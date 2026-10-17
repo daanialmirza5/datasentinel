@@ -18,6 +18,8 @@ Base path: `/api/v1`. Interactive documentation is served by the running API at
   Codes: `bad_request` 400, `not_found` 404, `conflict` 409, `payload_too_large` 413,
   `unsupported_media_type` 415, `validation_failed` 422, `demo_mode` 403, `internal_error` 500
   (never includes internals).
+* **Request ids**: a client or proxy may send its own `X-Request-Id` (8–64 letters, digits, `_`,
+  `.` or `-`) and the API reuses it; anything else is replaced with a generated id.
 * **Pagination**: `limit` / `offset` query parameters; responses are `{items, total, limit, offset}`.
 * Identifiers are opaque prefixed strings (`ds_…`, `ver_…`, `rule_…`, `exp_…`, `rpt_…`, `asset_…`).
 
