@@ -35,6 +35,8 @@ CI runs the same checks plus a Docker build and dependency audits.
 * **Schema changes need a migration:**
   `.\.venv\Scripts\python.exe -m alembic revision --autogenerate -m "describe change"` and keep
   `test_migrations_match_models` green.
+* **API changes need a fresh spec:** regenerate [docs/openapi.json](docs/openapi.json) from `backend/`
+  with `.\.venv\Scripts\python.exe -c "import json,pathlib; from datasentinel.main import create_app; pathlib.Path('../docs/openapi.json').write_text(json.dumps(create_app().openapi(), indent=1) + '\n', encoding='utf-8', newline='\n')"`.
 * **Dependencies:** pin exact versions and explain the benefit in the PR. On Windows, check that new
   native wheels load under Smart App Control ([ADR 0007](docs/adr/0007-dependency-pinning-under-smart-app-control.md)).
 * Commit messages: imperative mood, one logical change per commit.
