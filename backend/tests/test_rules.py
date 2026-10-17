@@ -243,3 +243,15 @@ def test_unique_rejects_blank_or_repeated_extra_columns():
         UniqueParams(extra_columns=[" "])
     with pytest.raises(ValidationError, match="repeat"):
         UniqueParams(extra_columns=["region", "region"])
+
+
+@pytest.mark.parametrize("bound", ["nan", "inf", "-inf"])
+def test_range_bounds_must_be_finite(bound):
+    from pydantic import ValidationError
+
+    from datasentinel.rules.params import AggregateRangeParams, RangeParams
+
+    with pytest.raises(ValidationError):
+        RangeParams(min=bound)
+    with pytest.raises(ValidationError):
+        AggregateRangeParams(aggregate="mean", max=bound)

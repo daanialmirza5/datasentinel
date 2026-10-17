@@ -11,7 +11,8 @@ DataType = Literal["integer", "float", "boolean", "datetime", "string"]
 
 
 class _Params(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # NaN bounds compare false against everything, which would make range checks pass silently.
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
 
 
 class ColumnExistsParams(_Params):
