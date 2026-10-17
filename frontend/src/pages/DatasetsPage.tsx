@@ -5,7 +5,7 @@ import { DistributionChart, FrequencyChart, TimeSeriesChart } from '../component
 import { useDatasets, useSelectedDataset } from '../hooks/useDatasets';
 import { ImportPanel } from '../components/ImportPanel';
 import { Badge, Button, Card, EmptyState, ErrorState, KeyValue, Loading, PageHeader, Pagination, RuleStatusBadge, SeverityBadge, Tabs } from '../components/ui';
-import { cx, formatBytes, formatDate, formatNumber, inputClass } from '../lib/format';
+import { cx, formatBytes, formatDate, formatNumber, formatPercent, inputClass } from '../lib/format';
 import { useAsync } from '../hooks/useAsync';
 
 type Tab = 'versions' | 'preview' | 'profile' | 'quality' | 'anomalies';
@@ -285,8 +285,8 @@ function ProfileView({ datasetId, versionId }: { datasetId: string; versionId: s
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <MiniStat label="Rows" value={formatNumber(p.row_count)} />
         <MiniStat label="Columns" value={p.column_count} />
-        <MiniStat label="Duplicate rows" value={`${p.duplicate_rows} (${formatNumber(p.duplicate_pct)}%)`} />
-        <MiniStat label="Missing cells" value={`${formatNumber(p.missing_pct)}%`} />
+        <MiniStat label="Duplicate rows" value={`${p.duplicate_rows} (${formatPercent(p.duplicate_pct)})`} />
+        <MiniStat label="Missing cells" value={formatPercent(p.missing_pct)} />
       </div>
       <p className="text-xs text-ink-3">
         {p.notes.join(' ')} Computed {formatDate(profile.data.computed_at)} in {formatNumber(profile.data.duration_ms)} ms{profile.data.cached ? ' (cached)' : ''}.
@@ -311,7 +311,7 @@ function MiniStat({ label, value }: { label: string; value: React.ReactNode }) {
 
 function ColumnCard({ column: c }: { column: ColumnProfile }) {
   const stats: [string, React.ReactNode][] = [
-    ['Missing', `${c.null_count} (${formatNumber(c.null_pct)}%)`],
+    ['Missing', `${c.null_count} (${formatPercent(c.null_pct)})`],
     ['Distinct', `${formatNumber(c.distinct_count)}${c.unique ? ' — unique' : ''}`],
     ['Invalid', c.invalid_count ? `${c.invalid_count} (e.g. ${c.invalid_examples.slice(0, 2).map((e) => `"${e}"`).join(', ')})` : '0'],
   ];

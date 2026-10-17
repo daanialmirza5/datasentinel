@@ -22,6 +22,11 @@ export function formatNumber(value: number | null | undefined, digits = 2): stri
   return value.toLocaleString(undefined, { maximumFractionDigits: digits });
 }
 
+export function formatPercent(value: number | null | undefined, digits = 2): string {
+  const text = formatNumber(value, digits);
+  return text === '—' ? text : `${text}%`;
+}
+
 export function formatDate(value: string | null | undefined): string {
   if (!value) return '—';
   const date = new Date(value);

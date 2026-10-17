@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatBytes } from './format';
+import { formatBytes, formatPercent } from './format';
 
 describe('formatBytes', () => {
   it('picks a readable unit', () => {
@@ -12,5 +12,12 @@ describe('formatBytes', () => {
   it('shows a dash for values that are not sizes', () => {
     expect(formatBytes(-1)).toBe('—');
     expect(formatBytes(Number.NaN)).toBe('—');
+  });
+});
+
+describe('formatPercent', () => {
+  it('appends a percent sign only to real numbers', () => {
+    expect(formatPercent(12.345)).toBe('12.35%');
+    expect(formatPercent(null)).toBe('—');
   });
 });
