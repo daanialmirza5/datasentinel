@@ -34,7 +34,7 @@ penetration test has been performed.
 | Mass assignment / unexpected fields | Pydantic models with `extra="forbid"` on every write payload |
 | Information leakage | Uniform error envelope; unexpected exceptions return a generic 500 with a request id (details only in server logs) |
 | Cross-origin abuse | CORS restricted to configured origins, no credentials |
-| Clickjacking / MIME sniffing | `X-Frame-Options: DENY`, CSP `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer` |
+| Clickjacking / MIME sniffing | `X-Frame-Options: DENY`, CSP `frame-ancestors 'none'`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Cross-Origin-Opener-Policy: same-origin`, `Permissions-Policy` denying camera, microphone and geolocation |
 | Public demo misuse | Demo mode refuses uploads and edits (403) |
 | Secrets in Git | No secrets are required; `.env` is git-ignored; `.env.example` contains placeholders only. The optional PostgreSQL URL must come from the environment |
 | Vulnerable dependencies | All versions pinned; `pip-audit` and `npm audit` run in CI and reported no known vulnerabilities at the time of writing; Dependabot configured |
