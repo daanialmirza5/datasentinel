@@ -42,6 +42,8 @@ class RequestContextMiddleware:
                         (b"x-content-type-options", b"nosniff"),
                         (b"x-frame-options", b"DENY"),
                         (b"referrer-policy", b"no-referrer"),
+                        (b"cross-origin-opener-policy", b"same-origin"),
+                        (b"permissions-policy", b"camera=(), microphone=(), geolocation=()"),
                         (b"cache-control", b"no-store"),
                     ]
                 )

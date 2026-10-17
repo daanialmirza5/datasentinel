@@ -13,6 +13,8 @@ def test_health_reports_ok(client):
     assert response.json()["status"] == "ok"
     assert response.headers["x-content-type-options"] == "nosniff"
     assert "x-request-id" in response.headers
+    assert response.headers["cross-origin-opener-policy"] == "same-origin"
+    assert "camera=()" in response.headers["permissions-policy"]
 
 
 def test_well_formed_incoming_request_id_is_reused(client):
