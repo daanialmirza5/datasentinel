@@ -30,6 +30,10 @@ describe('api client', () => {
     expect((init.headers as Record<string, string>)['Content-Type']).toBe('application/json');
   });
 
+  it('escapes ids used as path segments', () => {
+    expect(exportUrl('rpt/../x', 'json')).toBe('/api/v1/reports/rpt%2F..%2Fx/export?format=json');
+  });
+
   it('exposes report export URLs', () => {
     expect(exportUrl('rpt_1', 'markdown')).toBe('/api/v1/reports/rpt_1/export?format=markdown');
   });

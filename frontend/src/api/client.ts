@@ -43,6 +43,9 @@ export class ApiError extends Error {
   }
 }
 
+/** Escapes an id for use as one URL path segment. */
+const enc = encodeURIComponent;
+
 type Query = Record<string, string | number | boolean | null | undefined>;
 
 function buildUrl(path: string, query?: Query): string {
@@ -84,7 +87,7 @@ export async function request<T>(method: string, path: string, options: { query?
 }
 
 export function exportUrl(reportId: string, format: 'json' | 'markdown'): string {
-  return buildUrl(`/reports/${reportId}/export`, { format });
+  return buildUrl(`/reports/${enc(reportId)}/export`, { format });
 }
 
 export const api = {
@@ -98,53 +101,53 @@ export const api = {
   runRetention: () => request<{ expired_experiments_removed: number }>('POST', '/maintenance/retention'),
 
   datasets: (query?: Query) => request<Page<Dataset>>('GET', '/datasets', { query }),
-  dataset: (id: string) => request<Dataset>('GET', `/datasets/${id}`),
-  deleteDataset: (id: string) => request<{ deleted: boolean }>('DELETE', `/datasets/${id}`),
+  dataset: (id: string) => request<Dataset>('GET', `/datasets/${enc(id)}`),
+  deleteDataset: (id: string) => request<{ deleted: boolean }>('DELETE', `/datasets/${enc(id)}`),
   importDataset: (form: FormData) => request<ImportResponse>('POST', '/datasets/import', { form }),
-  versions: (id: string) => request<Version[]>('GET', `/datasets/${id}/versions`),
+  versions: (id: string) => request<Version[]>('GET', `/datasets/${enc(id)}/versions`),
   quarantine: (id: string, versionId: string, reason: string) =>
-    request<Version>('POST', `/datasets/${id}/versions/${versionId}/quarantine`, { body: { reason } }),
-  release: (id: string, versionId: string) => request<Version>('POST', `/datasets/${id}/versions/${versionId}/release`),
-  preview: (id: string, query: Query) => request<Preview>('GET', `/datasets/${id}/preview`, { query }),
+    request<Version>('POST', `/datasets/${enc(id)}/versions/${enc(versionId)}/quarantine`, { body: { reason } }),
+  release: (id: string, versionId: string) => request<Version>('POST', `/datasets/${enc(id)}/versions/${enc(versionId)}/release`),
+  preview: (id: string, query: Query) => request<Preview>('GET', `/datasets/${enc(id)}/preview`, { query }),
   rejectedRows: (id: string, versionId?: string) =>
-    request<{ total: number; truncated: boolean; rows: RejectedRow[] }>('GET', `/datasets/${id}/rejected-rows`, { query: { version_id: versionId } }),
-  profile: (id: string, versionId?: string) => request<ProfileResponse>('GET', `/datasets/${id}/profile`, { query: { version_id: versionId } }),
-  drift: (id: string, query?: Query) => request<DriftResponse>('GET', `/datasets/${id}/drift`, { query }),
-  anomalies: (id: string, query?: Query) => request<AnomalyResponse>('GET', `/datasets/${id}/anomalies`, { query }),
+    request<{ total: number; truncated: boolean; rows: RejectedRow[] }>('GET', `/datasets/${enc(id)}/rejected-rows`, { query: { version_id: versionId } }),
+  profile: (id: string, versionId?: string) => request<ProfileResponse>('GET', `/datasets/${enc(id)}/profile`, { query: { version_id: versionId } }),
+  drift: (id: string, query?: Query) => request<DriftResponse>('GET', `/datasets/${enc(id)}/drift`, { query }),
+  anomalies: (id: string, query?: Query) => request<AnomalyResponse>('GET', `/datasets/${enc(id)}/anomalies`, { query }),
 
   ruleTypes: () => request<{ severities: string[]; types: RuleTypeInfo[] }>('GET', '/rule-types'),
-  rules: (datasetId: string) => request<Rule[]>('GET', `/datasets/${datasetId}/rules`),
-  createRule: (datasetId: string, body: RuleInput) => request<Rule>('POST', `/datasets/${datasetId}/rules`, { body }),
-  updateRule: (ruleId: string, body: Partial<RuleInput>) => request<Rule>('PATCH', `/rules/${ruleId}`, { body }),
-  deleteRule: (ruleId: string) => request<{ deleted: boolean }>('DELETE', `/rules/${ruleId}`),
+  rules: (datasetId: string) => request<Rule[]>('GET', `/datasets/${enc(datasetId)}/rules`),
+  createRule: (datasetId: string, body: RuleInput) => request<Rule>('POST', `/datasets/${enc(datasetId)}/rules`, { body }),
+  updateRule: (ruleId: string, body: Partial<RuleInput>) => request<Rule>('PATCH', `/rules/${enc(ruleId)}`, { body }),
+  deleteRule: (ruleId: string) => request<{ deleted: boolean }>('DELETE', `/rules/${enc(ruleId)}`),
   suggestions: (datasetId: string) =>
-    request<{ suggestions: (RuleInput & { reason: string })[] }>('GET', `/datasets/${datasetId}/rules/suggestions`),
+    request<{ suggestions: (RuleInput & { reason: string })[] }>('GET', `/datasets/${enc(datasetId)}/rules/suggestions`),
   validate: (datasetId: string, body: { version_id?: string; rule_ids?: string[] } = {}) =>
-    request<ValidationRun>('POST', `/datasets/${datasetId}/validate`, { body }),
-  validations: (datasetId: string, query?: Query) => request<ValidationRun[]>('GET', `/datasets/${datasetId}/validations`, { query }),
-  validation: (runId: string) => request<ValidationRun>('GET', `/validations/${runId}`),
+    request<ValidationRun>('POST', `/datasets/${enc(datasetId)}/validate`, { body }),
+  validations: (datasetId: string, query?: Query) => request<ValidationRun[]>('GET', `/datasets/${enc(datasetId)}/validations`, { query }),
+  validation: (runId: string) => request<ValidationRun>('GET', `/validations/${enc(runId)}`),
 
   lineage: () => request<LineageGraph>('GET', '/lineage'),
-  asset: (id: string) => request<AssetDetails>('GET', `/lineage/${id}`),
-  impact: (id: string) => request<ImpactResponse>('GET', `/lineage/${id}/impact`),
+  asset: (id: string) => request<AssetDetails>('GET', `/lineage/${enc(id)}`),
+  impact: (id: string) => request<ImpactResponse>('GET', `/lineage/${enc(id)}/impact`),
   createAsset: (body: { name: string; kind: string; description?: string; owner?: string }) =>
     request<{ id: string }>('POST', '/lineage/assets', { body }),
-  deleteAsset: (id: string) => request<{ deleted: boolean }>('DELETE', `/lineage/assets/${id}`),
+  deleteAsset: (id: string) => request<{ deleted: boolean }>('DELETE', `/lineage/assets/${enc(id)}`),
   createEdge: (body: { source_id: string; target_id: string; description?: string }) =>
     request<{ id: string }>('POST', '/lineage/edges', { body }),
-  deleteEdge: (id: string) => request<{ deleted: boolean }>('DELETE', `/lineage/edges/${id}`),
+  deleteEdge: (id: string) => request<{ deleted: boolean }>('DELETE', `/lineage/edges/${enc(id)}`),
 
   faultTypes: (datasetId?: string) => request<{ fault_types: FaultType[] }>('GET', '/experiments/fault-types', { query: { dataset_id: datasetId } }),
   experiments: (query?: Query) => request<Page<Experiment>>('GET', '/experiments', { query }),
-  experiment: (id: string) => request<Experiment>('GET', `/experiments/${id}`),
+  experiment: (id: string) => request<Experiment>('GET', `/experiments/${enc(id)}`),
   createExperiment: (body: { dataset_id: string; version_id?: string; fault_type: string; params: Record<string, unknown>; seed: number }) =>
     request<Experiment>('POST', '/experiments', { body }),
   regenerateExperiment: (id: string, seed?: number) =>
-    request<Experiment>('POST', `/experiments/${id}/regenerate`, { body: seed === undefined ? {} : { seed } }),
-  deleteExperiment: (id: string) => request<{ deleted: boolean }>('DELETE', `/experiments/${id}`),
+    request<Experiment>('POST', `/experiments/${enc(id)}/regenerate`, { body: seed === undefined ? {} : { seed } }),
+  deleteExperiment: (id: string) => request<{ deleted: boolean }>('DELETE', `/experiments/${enc(id)}`),
 
   reports: () => request<Page<ReportSummary>>('GET', '/reports'),
-  report: (id: string) => request<Report>('GET', `/reports/${id}`),
+  report: (id: string) => request<Report>('GET', `/reports/${enc(id)}`),
   createReport: (body: { dataset_id?: string; experiment_id?: string; title?: string }) => request<Report>('POST', '/reports', { body }),
-  deleteReport: (id: string) => request<{ deleted: boolean }>('DELETE', `/reports/${id}`),
+  deleteReport: (id: string) => request<{ deleted: boolean }>('DELETE', `/reports/${enc(id)}`),
 };
