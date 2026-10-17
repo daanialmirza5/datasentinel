@@ -83,6 +83,7 @@ export async function request<T>(method: string, path: string, options: { query?
     throw new ApiError(0, 'network_error', 'Cannot reach the DataSentinel API. Is the backend running?');
   }
   if (!response.ok) throw await parseError(response);
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 

@@ -30,6 +30,11 @@ describe('api client', () => {
     expect((init.headers as Record<string, string>)['Content-Type']).toBe('application/json');
   });
 
+  it('resolves empty 204 responses without parsing a body', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
+    await expect(api.deleteRule('rul_1')).resolves.toBeUndefined();
+  });
+
   it('escapes ids used as path segments', () => {
     expect(exportUrl('rpt/../x', 'json')).toBe('/api/v1/reports/rpt%2F..%2Fx/export?format=json');
   });
