@@ -28,6 +28,7 @@ import pandas as pd
 from datasentinel.errors import UnsupportedMediaType, ValidationFailed
 
 SUPPORTED_FORMATS = {"csv", "json", "jsonl"}
+FORMAT_ALIASES = {"ndjson": "jsonl", "tsv": "csv"}
 EXTENSION_FORMATS = {".csv": "csv", ".tsv": "csv", ".json": "json", ".jsonl": "jsonl", ".ndjson": "jsonl"}
 
 # Values treated as missing. Matching is exact after stripping whitespace (case-sensitive set
@@ -78,7 +79,7 @@ class ParsedTable:
 
 def detect_format(filename: str, explicit: str | None = None) -> str:
     if explicit:
-        fmt = explicit.lower().strip()
+        fmt = FORMAT_ALIASES.get(explicit.lower().strip(), explicit.lower().strip())
         if fmt not in SUPPORTED_FORMATS:
             raise UnsupportedMediaType(f"Unsupported format '{explicit}'. Supported: csv, json, jsonl.")
         return fmt

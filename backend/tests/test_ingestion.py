@@ -137,6 +137,8 @@ def test_detect_format():
     assert detect_format("data.CSV") == "csv"
     assert detect_format("x.ndjson") == "jsonl"
     assert detect_format("anything", "json") == "json"
+    assert detect_format("anything", " NDJSON ") == "jsonl"
+    assert detect_format("anything", "tsv") == "csv"
     with pytest.raises(UnsupportedMediaType):
         detect_format("payload.exe")
     with pytest.raises(UnsupportedMediaType):
