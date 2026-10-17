@@ -9,7 +9,7 @@ Lists accept comma-separated values or a JSON array. See [`.env.example`](../.en
 | `DATASENTINEL_DATA_DIR` | `backend/var` | SQLite database and uploaded files (`storage/`). |
 | `DATASENTINEL_DATABASE_URL` | SQLite in `DATA_DIR` | e.g. `postgresql+psycopg://user:password@host:5432/db` (install `requirements-postgres.txt`). Treat as a secret. |
 | `DATASENTINEL_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Browser origins allowed to call the API. Not needed when the API serves the frontend itself. |
-| `DATASENTINEL_LOG_LEVEL` | `INFO` | Python logging level. |
+| `DATASENTINEL_LOG_LEVEL` | `INFO` | Python logging level: `CRITICAL`, `ERROR`, `WARNING`, `INFO` or `DEBUG` (case-insensitive). |
 | `DATASENTINEL_MAX_UPLOAD_MB` | `25` | Upload size limit, enforced while the request body streams. |
 | `DATASENTINEL_MAX_ROWS` | `200000` | Maximum data rows per file. |
 | `DATASENTINEL_MAX_COLUMNS` | `200` | Maximum columns per file. |
