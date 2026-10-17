@@ -232,3 +232,14 @@ def test_timestamp_range_rejects_inverted_bounds():
         TimestampRangeParams(min="2026-02-01T00:00:00", max="2026-01-01T00:00:00")
     with pytest.raises(ValidationError, match="timezone"):
         TimestampRangeParams(min="2026-01-01T00:00:00Z", max="2026-02-01T00:00:00")
+
+
+def test_unique_rejects_blank_or_repeated_extra_columns():
+    from pydantic import ValidationError
+
+    from datasentinel.rules.params import UniqueParams
+
+    with pytest.raises(ValidationError, match="empty"):
+        UniqueParams(extra_columns=[" "])
+    with pytest.raises(ValidationError, match="repeat"):
+        UniqueParams(extra_columns=["region", "region"])

@@ -54,6 +54,14 @@ class UniqueParams(_Params):
     )
     ignore_nulls: bool = True
 
+    @model_validator(mode="after")
+    def _columns(self) -> UniqueParams:
+        if any(not name.strip() for name in self.extra_columns):
+            raise ValueError("extra_columns must not contain empty names")
+        if len(set(self.extra_columns)) != len(self.extra_columns):
+            raise ValueError("extra_columns must not repeat a column")
+        return self
+
 
 class AllowedValuesParams(_Params):
     values: list[str] = Field(min_length=1, max_length=1000)
