@@ -85,6 +85,13 @@ class TimestampRangeParams(_Params):
     def _bounds(self) -> TimestampRangeParams:
         if self.min is None and self.max is None and self.max_future_days is None:
             raise ValueError("Provide min, max or max_future_days")
+        if self.min is not None and self.max is not None:
+            try:
+                inverted = self.min > self.max
+            except TypeError as exc:  # naive vs timezone-aware
+                raise ValueError("min and max must both include a timezone or both omit it") from exc
+            if inverted:
+                raise ValueError("min must not exceed max")
         return self
 
 

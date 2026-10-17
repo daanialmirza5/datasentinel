@@ -221,3 +221,14 @@ def test_rule_types_catalogue_and_suggestions(client):
     for suggestion in suggestions:
         payload = {k: suggestion[k] for k in ("name", "rule_type", "column_name", "params", "severity")}
         assert client.post(f"/api/v1/datasets/{ds['id']}/rules", json=payload).status_code == 201
+
+
+def test_timestamp_range_rejects_inverted_bounds():
+    from pydantic import ValidationError
+
+    from datasentinel.rules.params import TimestampRangeParams
+
+    with pytest.raises(ValidationError, match="min must not exceed max"):
+        TimestampRangeParams(min="2026-02-01T00:00:00", max="2026-01-01T00:00:00")
+    with pytest.raises(ValidationError, match="timezone"):
+        TimestampRangeParams(min="2026-01-01T00:00:00Z", max="2026-02-01T00:00:00")
