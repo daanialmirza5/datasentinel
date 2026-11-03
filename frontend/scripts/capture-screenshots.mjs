@@ -27,7 +27,10 @@ const datasets = await (await fetch(`${base}/api/v1/datasets`)).json();
 const orders = datasets.items.find((d) => d.name === 'orders');
 const sensors = datasets.items.find((d) => d.name === 'sensor_readings');
 
-await shot('01-dashboard', '/');
+await shot('01-dashboard', '/', async () => {
+  // The dashboard fetches several summaries after the first paint; wait for them.
+  await page.getByText('Loading dashboard', { exact: false }).waitFor({ state: 'detached', timeout: 20000 });
+});
 await shot('02-dataset-profile', `/datasets?dataset=${orders.id}`, async () => {
   await page.getByRole('tab', { name: 'Profile' }).click();
   await page.getByText('Exact statistics', { exact: false }).first().waitFor({ timeout: 2000 }).catch(() => {});
