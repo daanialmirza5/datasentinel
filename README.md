@@ -2,6 +2,8 @@
 
 **Catch silent data failures before they corrupt your decisions.**
 
+**[Live demo](https://datasentinel-demo.onrender.com)**: a read-only demo workspace with sample datasets, drift, lineage and the fault lab. It runs on Render's free tier, so the first request can take about a minute while the server wakes.
+
 An explainable data observability platform for detecting data quality failures, schema drift,
 statistical anomalies, and downstream pipeline impact.
 
